@@ -67,7 +67,7 @@ public static class ApplicationConstants
     /// Fixed registration fee for all categories (in INR).
     /// Change this value to update the registration fee across the application.
     /// </summary>
-    public const decimal RegistrationFee = 500m;
+    public const decimal RegistrationFee = 450m;
 
     // ===== Database Constants =====
     /// <summary>
