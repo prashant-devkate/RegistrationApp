@@ -27,6 +27,17 @@ public static class ApplicationConstants
     public const long MaxPhotoFileSizeInBytes = 10 * 1024 * 1024;
 
     /// <summary>
+    /// How long a generated read-only SAS URL for a stored photo remains valid.
+    /// </summary>
+    public static readonly TimeSpan PhotoSasUrlLifetime = TimeSpan.FromHours(1);
+
+    /// <summary>
+    /// How long a SAS download link written into an exported Excel remains valid.
+    /// Longer-lived so the exported file stays usable for a while after download.
+    /// </summary>
+    public static readonly TimeSpan ExportImageLinkLifetime = TimeSpan.FromDays(7);
+
+    /// <summary>
     /// Allowed photo file extensions
     /// </summary>
     public static readonly string[] AllowedPhotoExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };

@@ -83,6 +83,11 @@ public class AzureStorageSettings
     public string ContainerName { get; set; } = "registrations";
 
     /// <summary>
+    /// Number of days a SAS download link written into an exported Excel remains valid.
+    /// </summary>
+    public int ExportImageLinkExpiryDays { get; set; } = 7;
+
+    /// <summary>
     /// Use managed identity instead of connection string
     /// </summary>
     public bool UseManagedIdentity { get; set; } = false;

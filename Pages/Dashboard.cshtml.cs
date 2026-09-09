@@ -2,9 +2,12 @@ using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using RegistrationApp.Core.Constants;
+using RegistrationApp.Core.Configuration;
 using RegistrationApp.Core.Time;
 using RegistrationApp.Data;
 using RegistrationApp.Models;
+using RegistrationApp.Services;
 
 namespace RegistrationApp.Pages;
 
@@ -13,6 +16,8 @@ public class DashboardModel : PageModel
     private const int PageSize = 5;
 
     private readonly ApplicationDbContext _dbContext;
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly IConfiguration _configuration;
 
     public List<RegistrationDashboardDto> Registrations { get; set; } = new();
     public int TotalRegistrations { get; set; }
@@ -22,10 +27,11 @@ public class DashboardModel : PageModel
 
     public int CurrentPage { get; set; } = 1;
     public int TotalPages { get; set; }
-
-    public DashboardModel(ApplicationDbContext dbContext)
+    public DashboardModel(ApplicationDbContext dbContext, IBlobStorageService blobStorageService, IConfiguration configuration)
     {
         _dbContext = dbContext;
+        _blobStorageService = blobStorageService;
+        _configuration = configuration;
     }
 
     public async Task OnGetAsync([FromQuery] int page = 1)
@@ -81,8 +87,8 @@ public class DashboardModel : PageModel
         {
             "Registration ID", "Name", "Address", "Phone Number", "Taluka",
             "T-Shirt Size", "Category", "Registration Status", "Created At (UTC)",
-            "Updated At (UTC)", "Confirmed At (UTC)", "Photo Blob", "Aadhar Front Blob",
-            "Aadhar Back Blob", "Payment Status", "Amount (INR)", "Currency",
+            "Updated At (UTC)", "Confirmed At (UTC)", "Photo Link", "Aadhar Front Link",
+            "Aadhar Back Link", "Payment Status", "Amount (INR)", "Currency",
             "Razorpay Order ID", "Razorpay Payment ID", "Payment Error"
         };
 
@@ -114,9 +120,9 @@ public class DashboardModel : PageModel
             worksheet.Cell(row, 9).Value = r.CreatedAt;
             worksheet.Cell(row, 10).Value = r.UpdatedAt;
             worksheet.Cell(row, 11).Value = r.ConfirmedAt;
-            worksheet.Cell(row, 12).Value = r.PhotoBlobName;
-            worksheet.Cell(row, 13).Value = r.AadharFrontBlobName;
-            worksheet.Cell(row, 14).Value = r.AadharBackBlobName;
+            SetImageLinkCell(worksheet.Cell(row, 12), r.PhotoBlobName);
+            SetImageLinkCell(worksheet.Cell(row, 13), r.AadharFrontBlobName);
+            SetImageLinkCell(worksheet.Cell(row, 14), r.AadharBackBlobName);
             worksheet.Cell(row, 15).Value = latestPayment?.Status.ToString() ?? "None";
             worksheet.Cell(row, 16).Value = latestPayment != null ? latestPayment.AmountInPaise / 100 : (decimal?)null;
             worksheet.Cell(row, 17).Value = latestPayment?.Currency;
@@ -137,6 +143,31 @@ public class DashboardModel : PageModel
             content,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             fileName);
+    }
+
+    /// <summary>
+    /// Writes a clickable, time-limited download link for a stored image into the cell.
+    /// Shows a placeholder when no image blob exists.
+    /// </summary>
+    private void SetImageLinkCell(IXLCell cell, string? blobName)
+    {
+        if (string.IsNullOrWhiteSpace(blobName))
+        {
+            cell.Value = "N/A";
+            return;
+        }
+
+        var expiryDays = _configuration.GetValue<int?>(
+            $"{AzureStorageSettings.SectionName}:{nameof(AzureStorageSettings.ExportImageLinkExpiryDays)}")
+            ?? ApplicationConstants.ExportImageLinkLifetime.Days;
+
+        var lifetime = TimeSpan.FromDays(expiryDays > 0 ? expiryDays : 1);
+
+        var url = _blobStorageService.GetDownloadUrl(blobName, lifetime);
+        cell.Value = "Download";
+        cell.SetHyperlink(new XLHyperlink(url));
+        cell.Style.Font.FontColor = XLColor.Blue;
+        cell.Style.Font.Underline = XLFontUnderlineValues.Single;
     }
 }
 

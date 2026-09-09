@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using Microsoft.Extensions.Logging;
 using RegistrationApp.Core.Constants;
 using RegistrationApp.Core.Time;
@@ -40,6 +41,14 @@ public interface IBlobStorageService
     /// <param name="blobName">The blob name/path</param>
     /// <returns>The blob URL</returns>
     string GetPhotoUrl(string blobName);
+
+    /// <summary>
+    /// Get a read-only download URL valid for the given lifetime.
+    /// Suitable for links embedded in exported files.
+    /// </summary>
+    /// <param name="blobName">The blob name/path</param>
+    /// <param name="lifetime">How long the link should remain valid</param>
+    string GetDownloadUrl(string blobName, TimeSpan lifetime);
 }
 
 /// <summary>
@@ -180,15 +189,48 @@ public class BlobStorageService : IBlobStorageService
     }
 
     /// <summary>
-    /// Get a URL for accessing the photo
+    /// Get a URL for accessing the photo.
+    /// The container is kept private; a short-lived read-only SAS URL is returned so the
+    /// image can be viewed securely without exposing the container to anonymous public access.
+    /// Falls back to the plain blob URI if a SAS cannot be generated (e.g. Managed Identity auth).
     /// </summary>
     public string GetPhotoUrl(string blobName)
+    {
+        return GetDownloadUrl(blobName, ApplicationConstants.PhotoSasUrlLifetime);
+    }
+
+    /// <summary>
+    /// Get a read-only download URL valid for the given lifetime.
+    /// The container is kept private; a signed SAS URL is returned so the image can be
+    /// accessed securely (e.g. from a link in an exported Excel) without anonymous access.
+    /// Falls back to the plain blob URI if a SAS cannot be generated (e.g. Managed Identity auth).
+    /// </summary>
+    public string GetDownloadUrl(string blobName, TimeSpan lifetime)
     {
         if (string.IsNullOrWhiteSpace(blobName))
             throw new ArgumentException("Blob name cannot be empty", nameof(blobName));
 
-        // Return the blob URL
         var blobClient = _containerClient.GetBlobClient(blobName);
+
+        if (blobClient.CanGenerateSasUri)
+        {
+            var sasBuilder = new BlobSasBuilder
+            {
+                BlobContainerName = _containerClient.Name,
+                BlobName = blobName,
+                Resource = "b",
+                ExpiresOn = DateTimeOffset.UtcNow.Add(lifetime)
+            };
+            sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+            return blobClient.GenerateSasUri(sasBuilder).ToString();
+        }
+
+        _logger.LogWarning(
+            "SAS URL could not be generated for blob {BlobName}; returning direct URI. " +
+            "Ensure the storage client uses an account key or configure user-delegation SAS.",
+            blobName);
+
         return blobClient.Uri.ToString();
     }
 
