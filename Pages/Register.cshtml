@@ -1,0 +1,217 @@
+@page "/register"
+@model RegisterModel
+@{
+    ViewData["Title"] = "Cricket Tournament Registration";
+    Layout = "_BlankLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/registration.css" asp-append-version="true" />
+}
+
+<div class="registration-wrapper">
+    <div class="registration-container">
+        <!-- Header Section -->
+        <div class="registration-header">
+            <h1>Join the Game</h1>
+            <p class="header-subtitle">Complete your registration to compete</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="registration-content">
+            <form method="post" class="registration-form" enctype="multipart/form-data">
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <div class="section-title">Personal Information</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Full Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="fullName" name="fullName" 
+                                   value="@Model.Input?.FullName" required maxlength="200" 
+                                   placeholder="Enter your full name" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
+                                   value="@Model.Input?.PhoneNumber" required maxlength="20" 
+                                   placeholder="Enter your phone number" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location & Category Section -->
+                <div class="form-section">
+                    <div class="section-title">Tournament Details</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="categoryId">Category <span class="required">*</span></label>
+                            <select class="form-control" id="categoryId" name="categoryId" required>
+                                <option value="">-- Select Category --</option>
+                                @if (Model.Categories != null)
+                                {
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <option value="@category.Id" selected="@(Model.Input?.CategoryId == category.Id)">
+                                            @category.Name
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taluka">Taluka <span class="required">*</span></label>
+                            <select class="form-control" id="taluka" name="taluka" required>
+                                <option value="">-- Select Taluka --</option>
+                                @if (Model.TalukaOptions != null)
+                                {
+                                    @foreach (var taluka in Model.TalukaOptions)
+                                    {
+                                        <option value="@taluka" selected="@(Model.Input?.Taluka == taluka)">
+                                            @taluka
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tshirtSize">T-Shirt Size <span class="required">*</span></label>
+                            <select class="form-control" id="tshirtSize" name="tshirtSize" required>
+                                <option value="">-- Select Size --</option>
+                                @if (Model.TShirtSizeOptions != null)
+                                {
+                                    @foreach (var size in Model.TShirtSizeOptions)
+                                    {
+                                        <option value="@size" selected="@(Model.Input?.TShirtSize == size)">
+                                            @size
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Address <span class="required">*</span></label>
+                            <textarea class="form-control" id="address" name="address" rows="2" 
+                                      required maxlength="500" 
+                                      placeholder="Enter your complete address">@Model.Input?.Address</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- File Upload Section -->
+                <div class="form-section">
+                    <div class="section-title">Photo & Documents</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="photo">Photo <span class="required">*</span></label>
+                            <input type="file" class="form-control file-input" id="photo" name="photo" accept="image/*" required />
+                            <small class="file-hint">Max: 10 MB | JPG, PNG, GIF</small>
+                        </div>
+
+                        <div class="form-group"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="aadharFront">Aadhar - Front <span class="required">*</span></label>
+                            <input type="file" class="form-control file-input" id="aadharFront" name="aadharFront" accept="image/*" required />
+                            <small class="file-hint">Max: 10 MB | JPG, PNG</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="aadharBack">Aadhar - Back <span class="required">*</span></label>
+                            <input type="file" class="form-control file-input" id="aadharBack" name="aadharBack" accept="image/*" required />
+                            <small class="file-hint">Max: 10 MB | JPG, PNG</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn-register">Make a Payment</button>
+                    <a href="/" class="btn-back">Back to Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+@section Scripts {
+    <script>
+        // Toast notification system with timer bar
+        const showToast = (message, type = 'info', duration = 10000) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = {
+                'success': '✓',
+                'error': '✕',
+                'info': 'ℹ',
+                'warning': '⚠'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-content-wrapper">
+                    <div class="toast-icon">${icons[type]}</div>
+                    <div class="toast-content">
+                        <p>${message}</p>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+                <div class="toast-timer">
+                    <div class="toast-timer-bar"></div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        };
+
+        @{
+            // Display error toast if there was an error (priority: general error first)
+            if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <text>
+                    showToast('@Model.ErrorMessage', 'error', 10000);
+                </text>
+            }
+            // Display validation error toasts (only if no general error message)
+            else if (Model.ValidationErrors?.Count > 0)
+            {
+                foreach (var error in Model.ValidationErrors)
+                {
+                    <text>
+                        showToast('@error.Value', 'error', 10000);
+                    </text>
+                }
+            }
+
+            // Display success toast if registration was successful
+            if (Model.ShowSuccess)
+            {
+                <text>
+                    showToast('Registration Successful!', 'success', 10000);
+                </text>
+            }
+        }
+    </script>
+}
+

@@ -1,0 +1,98 @@
+@page "/payment-confirmation/{id:int}"
+@model PaymentConfirmationModel
+@{
+    ViewData["Title"] = "Payment Confirmation";
+    Layout = "_BlankLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/payment-confirmation.css" asp-append-version="true" />
+}
+
+<div class="receipt-wrapper">
+    <div class="receipt-card @(Model.IsSuccess ? "is-success" : "is-failed")">
+
+        <!-- Status Badge -->
+        <div class="receipt-status">
+            @if (Model.IsSuccess)
+            {
+                <div class="status-badge success">
+                    <svg viewBox="0 0 52 52" class="status-svg">
+                        <circle class="status-circle" cx="26" cy="26" r="24" fill="none" />
+                        <path class="status-check" fill="none" d="M14 27 l8 8 l16 -18" />
+                    </svg>
+                </div>
+                <h1 class="status-title">Payment Successful</h1>
+                <p class="status-subtitle">Your registration has been confirmed</p>
+            }
+            else
+            {
+                <div class="status-badge failed">
+                    <svg viewBox="0 0 52 52" class="status-svg">
+                        <circle class="status-circle" cx="26" cy="26" r="24" fill="none" />
+                        <path class="status-cross" fill="none" d="M18 18 L34 34 M34 18 L18 34" />
+                    </svg>
+                </div>
+                <h1 class="status-title">Payment Failed</h1>
+                <p class="status-subtitle">Your registration is saved and pending payment</p>
+            }
+        </div>
+
+        <!-- Amount -->
+        <div class="receipt-amount">
+            <span class="amount-currency">&#8377;</span>
+            <span class="amount-value">@Model.AmountPaid</span>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <!-- Transaction details -->
+        <div class="receipt-details">
+            <div class="receipt-row">
+                <span class="receipt-key">Registration ID</span>
+                <span class="receipt-val">#@Model.RegistrationId</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-key">Name</span>
+                <span class="receipt-val">@Model.RegistrationName</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-key">Phone</span>
+                <span class="receipt-val">@Model.RegistrationPhone</span>
+            </div>
+        </div>
+
+        @if (!Model.IsSuccess && !string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="receipt-error">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <div class="receipt-divider dashed"></div>
+
+        <!-- Actions -->
+        <div class="receipt-actions">
+            @if (Model.IsSuccess)
+            {
+                <a href="/" class="receipt-btn primary">Done</a>
+            }
+            else
+            {
+                <a href="/payment/@Model.RegistrationId" class="receipt-btn primary">Retry Payment</a>
+                <a href="/" class="receipt-btn ghost">Back to Home</a>
+            }
+        </div>
+
+        <p class="receipt-footer">
+            @if (Model.IsSuccess)
+            {
+                <span>Thank you for registering. See you at the tournament!</span>
+            }
+            else
+            {
+                <span>Need help? Contact <strong>support@example.com</strong></span>
+            }
+        </p>
+    </div>
+</div>

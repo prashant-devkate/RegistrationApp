@@ -1,0 +1,200 @@
+@page "/payment/{id:int}"
+@model PaymentModel
+@using RegistrationApp.Core.Constants
+@{
+    ViewData["Title"] = "Complete Payment";
+    Layout = "_BlankLayout";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/payment.css" asp-append-version="true" />
+}
+
+<div class="payment-wrapper">
+    <div class="payment-container">
+        <!-- Header Section -->
+        <div class="payment-header">
+            <h1>Complete Payment</h1>
+            <p class="header-subtitle">Finalize your registration with payment</p>
+        </div>
+
+        <!-- Payment Content -->
+        <div class="payment-content">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    <div class="alert-icon">✕</div>
+                    <div class="alert-body">
+                        <strong>Error</strong>
+                        <p>@Model.ErrorMessage</p>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Registration != null && Model.Category != null)
+            {
+                <!-- Registration Summary -->
+                <div class="payment-summary">
+                    <h3 class="summary-title">Registration Summary</h3>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Name:</span>
+                        <span class="summary-value">@Model.Registration.Name</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Phone:</span>
+                        <span class="summary-value">@Model.Registration.PhoneNumber</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">Category:</span>
+                        <span class="summary-value">@Model.Category.Name</span>
+                    </div>
+                </div>
+
+                <!-- Payment Amount -->
+                <div class="payment-amount">
+                    <div class="amount-label">Amount to Pay</div>
+                    <div class="amount-value">₹@ApplicationConstants.RegistrationFee</div>
+                </div>
+
+                <!-- Payment Button -->
+                <div id="payment-status-section">
+                    <button id="pay-button" class="btn-pay">Pay Now</button>
+                    <a href="/" class="btn-cancel">Cancel</a>
+                </div>
+
+                <!-- Payment Processing Message -->
+                <div id="payment-processing" class="payment-processing" style="display:none;">
+                    <div class="spinner"></div>
+                    <p>Processing payment... Please don't close this page.</p>
+                    <p class="text-muted">Your registration will be confirmed once payment is verified.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+@section Scripts {
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // Toast notification system
+        const showToast = (message, type = 'info', duration = 10000) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+
+            const icons = {
+                'success': '✓',
+                'error': '✕',
+                'info': 'ℹ',
+                'warning': '⚠'
+            };
+
+            toast.innerHTML = `
+                <div class="toast-content-wrapper">
+                    <div class="toast-icon">${icons[type]}</div>
+                    <div class="toast-content">
+                        <p>${message}</p>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+                <div class="toast-timer">
+                    <div class="toast-timer-bar"></div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        };
+
+        // Payment handler
+        document.getElementById('pay-button').addEventListener('click', function() {
+            const registrationId = @Model.Registration?.Id;
+            const orderId = '@Model.RazorpayOrderId';
+            const amount = @((long)(ApplicationConstants.RegistrationFee * 100));
+            const phone = '@Model.Registration?.PhoneNumber';
+            const name = '@Model.Registration?.Name';
+
+            const options = {
+                key: '@Model.RazorpayKeyId',
+                order_id: orderId,
+                amount: amount,
+                currency: 'INR',
+                name: 'Cricket Tournament',
+                description: 'Registration Payment',
+                prefill: {
+                    contact: '@Model.Registration?.PhoneNumber'
+                },
+                handler: async function(response) {
+                    // Payment completed - confirm immediately with server
+                    document.getElementById('payment-status-section').style.display = 'none';
+                    document.getElementById('payment-processing').style.display = 'block';
+
+                    showToast('Payment completed! Confirming your registration...', 'info', 15000);
+
+                    try {
+                        // Send payment details to server confirmation endpoint
+                        const confirmResponse = await fetch('/api/webhooks/razorpay/confirm', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                razorpayOrderId: '@Model.RazorpayOrderId',
+                                razorpayPaymentId: response.razorpay_payment_id,
+                                razorpaySignature: response.razorpay_signature
+                            })
+                        });
+
+                        if (confirmResponse.ok) {
+                            const confirmData = await confirmResponse.json();
+                            showToast('Registration confirmed successfully!', 'success', 8000);
+
+                            // Redirect to confirmation page after brief delay
+                            setTimeout(() => {
+                                window.location.href = `/payment-confirmation/${confirmData.registrationId}`;
+                            }, 2000);
+                        } else {
+                            const errorData = await confirmResponse.json();
+                            showToast('Error: ' + (errorData.message || 'Could not confirm registration'), 'error', 10000);
+
+                            // Still redirect to confirmation page so user can see status
+                            setTimeout(() => {
+                                window.location.href = `/payment-confirmation/@Model.Registration?.Id`;
+                            }, 3000);
+                        }
+                    } catch (error) {
+                        console.error('Confirmation error:', error);
+                        showToast('Network error: ' + error.message, 'error', 10000);
+
+                        // Still redirect to confirmation page so user can see current status
+                        setTimeout(() => {
+                            window.location.href = `/payment-confirmation/@Model.Registration?.Id`;
+                        }, 3000);
+                    }
+                },
+                modal: {
+                    ondismiss: function() {
+                        showToast('Payment cancelled', 'error', 10000);
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    </script>
+}

@@ -1,0 +1,137 @@
+@page "/dashboard"
+@model DashboardModel
+@{
+    ViewData["Title"] = "Registration Dashboard";
+    Layout = "~/Pages/Shared/_BlankLayout.cshtml";
+
+    string StatusBadge(string status) => status switch
+    {
+        "Confirmed" => "badge-success",
+        "PaymentPending" => "badge-warning",
+        "PaymentFailed" => "badge-danger",
+        _ => "badge-secondary"
+    };
+
+    string PaymentBadge(string status) => status switch
+    {
+        "Captured" => "badge-success",
+        "Authorized" => "badge-info",
+        "Failed" => "badge-danger",
+        "None" => "badge-secondary",
+        _ => "badge-warning"
+    };
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <a href="/" class="btn-icon btn-icon-home" title="Home" aria-label="Home">&#127968;</a>
+            <h1>Registration Dashboard</h1>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <a asp-page-handler="Export" class="btn-icon btn-icon-export" title="Export to Excel" aria-label="Export to Excel">&#128229;</a>
+            <a href="/logout" class="btn-icon btn-icon-logout" title="Logout" aria-label="Logout">&#8618;</a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="label">Total Registrations</div>
+            <div class="value">@Model.TotalRegistrations</div>
+        </div>
+        <div class="summary-card confirmed">
+            <div class="label">Confirmed</div>
+            <div class="value">@Model.ConfirmedRegistrations</div>
+        </div>
+        <div class="summary-card pending">
+            <div class="label">Pending Payment</div>
+            <div class="value">@Model.PendingPaymentRegistrations</div>
+        </div>
+        <div class="summary-card failed">
+            <div class="label">Payment Failed</div>
+            <div class="value">@Model.FailedPaymentRegistrations</div>
+        </div>
+    </div>
+
+    <!-- Registrations Table -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2>All Registrations</h2>
+        </div>
+
+        @if (Model.Registrations != null && Model.Registrations.Any())
+        {
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Reg ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Registration Status</th>
+                        <th>Payment Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reg in Model.Registrations)
+                    {
+                        <tr>
+                            <td data-label="Reg ID"><strong>@reg.Id</strong></td>
+                            <td data-label="Name">@reg.Name</td>
+                            <td data-label="Phone">@reg.PhoneNumber</td>
+                            <td data-label="Registration Status">
+                                <span class="badge @StatusBadge(reg.Status)">@reg.Status</span>
+                            </td>
+                            <td data-label="Payment Status">
+                                <span class="badge @PaymentBadge(reg.PaymentStatus)">@reg.PaymentStatus</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if (Model.TotalPages > 1)
+            {
+                <div class="pagination">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a href="?page=@(Model.CurrentPage - 1)">&laquo; Prev</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">&laquo; Prev</span>
+                    }
+
+                    @for (var p = 1; p <= Model.TotalPages; p++)
+                    {
+                        if (p == Model.CurrentPage)
+                        {
+                            <span class="active">@p</span>
+                        }
+                        else
+                        {
+                            <a href="?page=@p">@p</a>
+                        }
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a href="?page=@(Model.CurrentPage + 1)">Next &raquo;</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">Next &raquo;</span>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">No registrations found.</div>
+        }
+    </div>
+</div>

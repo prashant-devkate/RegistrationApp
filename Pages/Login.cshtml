@@ -1,0 +1,125 @@
+@page "/login"
+@model LoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = "~/Pages/Shared/_BlankLayout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <style>
+        .login-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin: 60px auto 0;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .login-card-header {
+            padding: 22px 24px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-dark-orange) 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .login-card-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--accent-navy);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+        }
+
+        .btn-login {
+            width: 100%;
+            justify-content: center;
+            background: var(--primary-orange);
+            color: var(--white);
+            margin-top: 8px;
+        }
+
+        .login-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .login-home-link {
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .login-home-link a {
+            color: var(--primary-dark-orange);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .login-home-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+}
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-card-header">
+            <h1 style="font-size:1.4rem;">Admin Login</h1>
+        </div>
+        <div class="login-card-body">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="login-error">@Model.ErrorMessage</div>
+            }
+
+            <form method="post">
+                <input type="hidden" asp-for="ReturnUrl" value="@Model.ReturnUrl" />
+                <div class="form-group">
+                    <label asp-for="Username">Username</label>
+                    <input asp-for="Username" autocomplete="username" required />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password">Password</label>
+                    <input asp-for="Password" type="password" autocomplete="current-password" required />
+                </div>
+                <button type="submit" class="btn btn-login">Sign In</button>
+            </form>
+
+            <div class="login-home-link">
+                <a href="/">&larr; Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
