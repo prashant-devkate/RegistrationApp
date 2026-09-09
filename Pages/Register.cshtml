@@ -26,15 +26,15 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="fullName">Full Name <span class="required">*</span></label>
-                            <input type="text" class="form-control" id="fullName" name="fullName" 
-                                   value="@Model.Input?.FullName" required maxlength="200" 
+                            <input type="text" class="form-control" id="fullName" name="fullName"
+                                   value="@Model.Input?.FullName" required maxlength="200"
                                    placeholder="Enter your full name" />
                         </div>
 
                         <div class="form-group">
                             <label for="phoneNumber">Phone Number <span class="required">*</span></label>
-                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" 
-                                   value="@Model.Input?.PhoneNumber" required maxlength="20" 
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                                   value="@Model.Input?.PhoneNumber" required maxlength="20"
                                    placeholder="Enter your phone number" />
                         </div>
                     </div>
@@ -43,6 +43,8 @@
                 <!-- Location & Category Section -->
                 <div class="form-section">
                     <div class="section-title">Tournament Details</div>
+
+                    <!-- Line 1: Category + T-Shirt Size -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="categoryId">Category <span class="required">*</span></label>
@@ -61,24 +63,6 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="taluka">Taluka <span class="required">*</span></label>
-                            <select class="form-control" id="taluka" name="taluka" required>
-                                <option value="">-- Select Taluka --</option>
-                                @if (Model.TalukaOptions != null)
-                                {
-                                    @foreach (var taluka in Model.TalukaOptions)
-                                    {
-                                        <option value="@taluka" selected="@(Model.Input?.Taluka == taluka)">
-                                            @taluka
-                                        </option>
-                                    }
-                                }
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
                             <label for="tshirtSize">T-Shirt Size <span class="required">*</span></label>
                             <select class="form-control" id="tshirtSize" name="tshirtSize" required>
                                 <option value="">-- Select Size --</option>
@@ -93,12 +77,31 @@
                                 }
                             </select>
                         </div>
+                    </div>
 
+                    <!-- Line 2: Address + Taluka -->
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="address">Address <span class="required">*</span></label>
-                            <textarea class="form-control" id="address" name="address" rows="2" 
-                                      required maxlength="500" 
+                            <textarea class="form-control" id="address" name="address" rows="2"
+                                      required maxlength="500"
                                       placeholder="Enter your complete address">@Model.Input?.Address</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taluka">Taluka <span class="required">*</span></label>
+                            <select class="form-control" id="taluka" name="taluka" required>
+                                <option value="">-- Select Taluka --</option>
+                                @if (Model.TalukaOptions != null)
+                                {
+                                    @foreach (var taluka in Model.TalukaOptions)
+                                    {
+                                        <option value="@taluka" selected="@(Model.Input?.Taluka == taluka)">
+                                            @taluka
+                                        </option>
+                                    }
+                                }
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -186,32 +189,31 @@
         };
 
         @{
-            // Display error toast if there was an error (priority: general error first)
-            if (!string.IsNullOrEmpty(Model.ErrorMessage))
-            {
-                <text>
-                    showToast('@Model.ErrorMessage', 'error', 10000);
-                </text>
-            }
-            // Display validation error toasts (only if no general error message)
-            else if (Model.ValidationErrors?.Count > 0)
-            {
-                foreach (var error in Model.ValidationErrors)
+                // Display error toast if there was an error (priority: general error first)
+                if (!string.IsNullOrEmpty(Model.ErrorMessage))
                 {
-                    <text>
-                        showToast('@error.Value', 'error', 10000);
-                    </text>
+                        <text>
+                                showToast('@Model.ErrorMessage', 'error', 10000);
+                        </text>
                 }
-            }
+                // Display validation error toasts (only if no general error message)
+                else if (Model.ValidationErrors?.Count > 0)
+                {
+                        foreach (var error in Model.ValidationErrors)
+                        {
+                                <text>
+                                        showToast('@error.Value', 'error', 10000);
+                                </text>
+                        }
+                }
 
-            // Display success toast if registration was successful
-            if (Model.ShowSuccess)
-            {
-                <text>
-                    showToast('Registration Successful!', 'success', 10000);
-                </text>
-            }
+                // Display success toast if registration was successful
+                if (Model.ShowSuccess)
+                {
+                        <text>
+                                showToast('Registration Successful!', 'success', 10000);
+                        </text>
+                }
         }
     </script>
 }
-

@@ -1,18 +1,21 @@
-/* Payment Page Styles - Indian Cricket Theme */
+/* Payment Page - Professional & Matches RD Events Theme */
 
 :root {
-    --primary-orange: #d97706;
-    --primary-dark-orange: #b45309;
-    --accent-green: #166534;
-    --accent-navy: #1e3a8a;
-    --cream-bg: #fef3c7;
+    --primary-red: #c0392b;
+    --primary-dark-red: #922b21;
+    --accent-orange: #e67e22;
+    --accent-gold: #f39c12;
+    --dark-navy: #1a1a2e;
+    --cream-bg: #fef8ee;
     --white: #ffffff;
+    --text-dark: #1f2937;
+    --text-secondary: #6b7280;
     --gray-light: #f3f4f6;
     --gray-border: #e5e7eb;
     --success: #10b981;
     --danger: #ef4444;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.12);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 * {
@@ -27,11 +30,11 @@ html, body {
 }
 
 body {
-    font-family: 'Georgia', 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, var(--cream-bg) 0%, #fef9e7 100%);
+    font-family: Arial, Helvetica, sans-serif; /* Professional clean font */
+    background: linear-gradient(135deg, #fef8ee 0%, #faeacb 50%, #f0d9b5 100%);
     min-height: 100vh;
     padding: 20px;
-    color: var(--accent-navy);
+    color: var(--dark-navy);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -52,6 +55,7 @@ body {
         opacity: 0;
         transform: translateY(40px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -61,20 +65,20 @@ body {
 .payment-container {
     width: 100%;
     max-width: 520px;
-    background: white;
-    border-radius: 12px;
+    background: var(--white);
+    border-radius: 10px;
     box-shadow: var(--shadow-md);
-    padding: 40px 32px;
-    animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 36px 30px;
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
     flex-direction: column;
 }
 
 /* Header */
 .payment-header {
-    margin-bottom: 30px;
+    margin-bottom: 28px;
     text-align: left;
-    animation: fadeInDown 0.6s ease-out 0.1s both;
+    animation: fadeInDown 0.5s ease-out 0.1s both;
 }
 
 @keyframes fadeInDown {
@@ -82,6 +86,7 @@ body {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -89,9 +94,9 @@ body {
 }
 
 .payment-header h1 {
-    font-size: 38px;
-    font-weight: 900;
-    color: var(--accent-navy);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark-navy);
     margin-bottom: 5px;
     letter-spacing: -0.5px;
     line-height: 1.2;
@@ -100,8 +105,8 @@ body {
 
 .header-subtitle {
     font-size: 14px;
-    color: var(--primary-orange);
-    font-weight: 500;
+    color: var(--accent-orange);
+    font-weight: 400;
     font-style: italic;
     margin: 0;
     line-height: 1.4;
@@ -117,9 +122,9 @@ body {
     background: var(--gray-light);
     border: 1px solid var(--gray-border);
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 24px;
-    animation: fadeInUp 0.6s ease-out 0.2s both;
+    padding: 18px;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.5s ease-out 0.2s both;
 }
 
 @keyframes fadeInUp {
@@ -127,6 +132,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -134,74 +140,76 @@ body {
 }
 
 .summary-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--accent-navy);
-    margin-bottom: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-navy);
+    margin-bottom: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding-bottom: 8px;
-    border-bottom: 2px solid var(--primary-orange);
+    border-bottom: 2px solid var(--gray-border);
 }
 
 .summary-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 8px 0;
     border-bottom: 1px solid var(--gray-border);
 }
 
-.summary-item:last-child {
-    border-bottom: none;
-}
+    .summary-item:last-child {
+        border-bottom: none;
+    }
 
 .summary-label {
     font-size: 13px;
-    font-weight: 600;
-    color: #666;
+    font-weight: 500;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
 .summary-value {
     font-size: 14px;
-    font-weight: 500;
-    color: var(--accent-navy);
+    font-weight: 600;
+    color: var(--dark-navy);
 }
 
-/* Payment Amount */
+/* ========== PAYMENT AMOUNT – Clean white card, navy text, orange accent ========== */
 .payment-amount {
-    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-dark-orange) 100%);
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-top: 4px solid var(--accent-orange);
     border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 24px;
+    padding: 20px;
+    margin-bottom: 20px;
     text-align: center;
-    animation: fadeInUp 0.6s ease-out 0.3s both;
+    box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.5s ease-out 0.3s both;
 }
 
 .amount-label {
     font-size: 13px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
 }
 
 .amount-value {
-    font-size: 44px;
-    font-weight: 900;
-    color: white;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--dark-navy);
     line-height: 1;
 }
 
 /* Alert Styles */
 .alert {
-    padding: 16px 20px;
+    padding: 14px 18px;
     border-radius: 8px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -213,6 +221,7 @@ body {
         opacity: 0;
         transform: translateY(-15px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -226,7 +235,7 @@ body {
 }
 
 .alert-icon {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     flex-shrink: 0;
     margin-top: 2px;
@@ -236,19 +245,19 @@ body {
     flex: 1;
 }
 
-.alert-body strong {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
+    .alert-body strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
 
-.alert-body p {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.5;
-}
+    .alert-body p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+    }
 
-/* Buttons */
+/* ========== Buttons – Professional, matching site CTA style ========== */
 .btn-pay,
 .btn-cancel {
     display: inline-block;
@@ -256,46 +265,46 @@ body {
     border: none;
     border-radius: 8px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.3s ease;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     width: 100%;
-    animation: fadeInUp 0.6s ease-out 0.4s both;
+    animation: fadeInUp 0.5s ease-out 0.4s both;
 }
 
 .btn-pay {
-    background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-dark-orange) 100%);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-dark-red) 100%);
     color: white;
     margin-bottom: 8px;
-    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.3);
+    box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
 }
 
-.btn-pay:hover {
-    background: linear-gradient(135deg, var(--primary-dark-orange) 0%, #92400e 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 32px rgba(217, 119, 6, 0.4);
-}
+    .btn-pay:hover {
+        background: linear-gradient(135deg, var(--primary-dark-red) 0%, #6b1a12 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(192, 57, 43, 0.3);
+    }
 
-.btn-pay:active {
-    transform: translateY(-1px);
-}
+    .btn-pay:active {
+        transform: translateY(0);
+    }
 
 .btn-cancel {
-    background: var(--gray-light);
-    color: var(--accent-navy);
+    background: var(--white);
+    color: var(--text-secondary);
     border: 2px solid var(--gray-border);
+    box-shadow: none;
 }
 
-.btn-cancel:hover {
-    background: white;
-    border-color: var(--primary-orange);
-    color: var(--primary-orange);
-    transform: translateY(-1px);
-}
+    .btn-cancel:hover {
+        background: var(--gray-light);
+        border-color: var(--accent-orange);
+        color: var(--accent-orange);
+    }
 
 /* Toast Notifications */
 .toast-container {
@@ -314,28 +323,29 @@ body {
     flex-direction: column;
     gap: 0;
     padding: 0;
-    background: white;
+    background: var(--white);
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     min-width: 300px;
     max-width: 400px;
     overflow: hidden;
-    animation: slideInRight 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideInRight 0.3s ease;
     opacity: 0;
     transform: translateX(400px);
     pointer-events: auto;
 }
 
-.toast.show {
-    opacity: 1;
-    transform: translateX(0);
-}
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
 
 @keyframes slideInRight {
     from {
         opacity: 0;
         transform: translateX(400px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -346,47 +356,47 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 14px 18px;
 }
 
 .toast-success {
     border-left: 4px solid var(--success);
 }
 
-.toast-success .toast-icon {
-    color: var(--success);
-}
+    .toast-success .toast-icon {
+        color: var(--success);
+    }
 
 .toast-error {
     border-left: 4px solid var(--danger);
 }
 
-.toast-error .toast-icon {
-    color: var(--danger);
-}
+    .toast-error .toast-icon {
+        color: var(--danger);
+    }
 
 .toast-icon {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 900;
     flex-shrink: 0;
 }
 
 .toast-content {
     flex: 1;
-    color: var(--accent-navy);
+    color: var(--dark-navy);
 }
 
-.toast-content p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
-}
+    .toast-content p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
 
 .toast-close {
     background: none;
     border: none;
     color: #999;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
     padding: 0;
     width: 24px;
@@ -398,9 +408,9 @@ body {
     transition: color 0.2s ease;
 }
 
-.toast-close:hover {
-    color: var(--accent-navy);
-}
+    .toast-close:hover {
+        color: var(--dark-navy);
+    }
 
 /* Toast Timer Bar */
 .toast-timer {
@@ -413,7 +423,7 @@ body {
 
 .toast-timer-bar {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-orange), var(--primary-dark-orange));
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-dark-red));
     width: 100%;
     animation: timerCountdown 10s linear forwards;
 }
@@ -430,62 +440,26 @@ body {
     from {
         width: 100%;
     }
+
     to {
         width: 0%;
     }
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .payment-container {
-        padding: 40px 32px;
-    }
-
-    .payment-header h1 {
-        font-size: 36px;
-    }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
     .payment-container {
-        padding: 35px 28px;
-        border-radius: 12px;
+        padding: 28px 22px;
+        border-radius: 10px;
         max-width: 100%;
     }
 
-    .payment-header {
-        margin-bottom: 28px;
-    }
-
     .payment-header h1 {
-        font-size: 32px;
-    }
-
-    .header-subtitle {
-        font-size: 13px;
-    }
-
-    .payment-summary {
-        padding: 16px;
-    }
-
-    .summary-title {
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    .summary-item {
-        padding: 8px 0;
+        font-size: 28px;
     }
 
     .amount-value {
-        font-size: 36px;
-    }
-
-    .btn-pay,
-    .btn-cancel {
-        padding: 11px 32px;
-        font-size: 13px;
+        font-size: 32px;
     }
 }
 
@@ -495,89 +469,43 @@ body {
     }
 
     .payment-container {
-        padding: 30px 22px;
-        border-radius: 12px;
-    }
-
-    .payment-header {
-        margin-bottom: 24px;
-    }
-
-    .payment-header h1 {
-        font-size: 28px;
-    }
-
-    .header-subtitle {
-        font-size: 12px;
-    }
-
-    .payment-summary {
-        padding: 14px;
-        margin-bottom: 20px;
-    }
-
-    .payment-amount {
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    .amount-value {
-        font-size: 32px;
-    }
-
-    .toast-container {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-    }
-
-    .toast {
-        min-width: auto;
-        max-width: none;
-    }
-}
-
-@media (max-width: 400px) {
-    .payment-wrapper {
-        padding: 10px;
-    }
-
-    .payment-container {
-        padding: 25px 18px;
+        padding: 24px 18px;
     }
 
     .payment-header h1 {
         font-size: 24px;
     }
 
-    .header-subtitle {
-        font-size: 11px;
-    }
-
     .payment-summary {
-        padding: 12px;
+        padding: 14px;
     }
 
-    .summary-label {
-        font-size: 11px;
-    }
-
-    .summary-value {
-        font-size: 12px;
-    }
-
-    .amount-value {
-        font-size: 28px;
+    .payment-amount {
+        padding: 16px;
     }
 
     .btn-pay,
     .btn-cancel {
         padding: 10px 24px;
-        font-size: 12px;
+        font-size: 13px;
     }
 }
 
-/* Payment Processing States */
+@media (max-width: 400px) {
+    .payment-container {
+        padding: 20px 15px;
+    }
+
+    .payment-header h1 {
+        font-size: 22px;
+    }
+
+    .amount-value {
+        font-size: 28px;
+    }
+}
+
+/* Processing State */
 .payment-processing {
     text-align: center;
     padding: 30px 20px;
@@ -587,9 +515,9 @@ body {
     display: inline-block;
     width: 48px;
     height: 48px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border: 4px solid var(--gray-light);
-    border-top-color: var(--primary-orange);
+    border-top-color: var(--primary-red);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -601,16 +529,15 @@ body {
 }
 
 .payment-processing p {
-    margin: 12px 0;
-    font-size: 16px;
-    color: var(--accent-navy);
+    margin: 8px 0;
+    font-size: 15px;
+    color: var(--dark-navy);
     font-weight: 500;
 }
 
 .payment-processing .text-muted {
-    color: #6b7280;
-    font-size: 14px;
-    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
 #payment-status-section {

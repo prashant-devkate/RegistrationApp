@@ -72,6 +72,16 @@ body {
     animation: fadeInRight .8s ease-out .2s both;
 }
 
+/* Large RD Events Logo inside right panel */
+.rd-logo-large {
+    width: 80% !important; /* controls width relative to frame */
+    max-width: 600px !important; /* absolute maximum width */
+    height: auto !important; /* keeps aspect ratio */
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+}
+
     .rd-logo-corner img {
         max-height: 80px;
         width: auto;
