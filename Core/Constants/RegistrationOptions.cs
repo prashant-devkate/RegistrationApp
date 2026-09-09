@@ -12,9 +12,10 @@ public static class RegistrationOptions
     {
         "Pathardi",
         "Shevgaon",
-        "Gevrai",
-        "Taluka 4",
-        "Taluka 5"
+        "Jamkhed",
+        "Patoda",
+        "Shirur",
+        "Ashti"
     };
 
     /// <summary>
