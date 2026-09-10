@@ -12,8 +12,6 @@ public static class RegistrationOptions
     {
         "Pathardi",
         "Shevgaon",
-        "Jamkhed",
-        "Patoda",
         "Shirur",
         "Ashti",
         "Other"
