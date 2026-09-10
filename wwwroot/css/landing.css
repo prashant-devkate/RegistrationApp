@@ -155,71 +155,92 @@ body {
             left: 100%;
         }
 
-/* ========== RIGHT PANEL – Clean white background with RD Events Logo ========== */
+/* ========== Organizer Branding (below Register button) ========== */
+.organizer-branding {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(192, 57, 43, .15);
+    animation: fadeInUp .8s ease-out .6s both;
+    max-width: 440px;
+}
+
+.organizer-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--dark-navy);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.35;
+    margin-bottom: 8px;
+}
+
+.organizer-season {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-red);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.season-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(192, 57, 43, .5), transparent);
+    max-width: 40px;
+}
+
+.season-text {
+    white-space: nowrap;
+}
+
+/* ========== RIGHT PANEL – Event Banner + RD Events Logo ========== */
 .landing-info {
     grid-column: 2;
     background: var(--white);
     position: relative;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 60px;
+    padding: 50px 40px;
+    gap: 30px;
     overflow: hidden;
 }
 
-    /* Very subtle decorative rings behind the logo (keeps panel from feeling empty) */
-    .landing-info::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 480px;
-        height: 480px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(230, 126, 34, .04) 0%, rgba(192, 57, 43, .03) 40%, transparent 70%);
-        pointer-events: none;
-    }
-
-    .landing-info::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 620px;
-        height: 620px;
-        border-radius: 50%;
-        border: 1px solid rgba(192, 57, 43, .06);
-        pointer-events: none;
-    }
-
-/* Logo showcase container – perfect centering */
-.logo-showcase {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Event Banner */
+.event-banner {
     width: 100%;
-    height: 100%;
+    max-width: 500px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
+    z-index: 2;
     animation: fadeInRight .9s cubic-bezier(.34, 1.56, .64, 1) .2s both;
+    border: 3px solid #f0e0c0;
 }
 
-    .logo-showcase img {
+    .event-banner img {
         width: 100%;
-        max-width: 420px;
         height: auto;
-        object-fit: contain;
         display: block;
-        margin: 0 auto;
-        filter: drop-shadow(0 15px 40px rgba(192, 57, 43, .12));
-        transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
     }
 
-        .logo-showcase img:hover {
-            transform: scale(1.03);
-        }
+/* RD Events Logo below banner */
+.rd-logo-below {
+    z-index: 2;
+    animation: fadeInUp .8s ease-out .4s both;
+}
+
+    .rd-logo-below img {
+        max-height: 130px;
+        width: auto;
+        display: block;
+        margin: 0 auto;
+        filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .15));
+    }
 
 /* ========== ANIMATIONS ========== */
 @keyframes slideInLeft {
@@ -294,10 +315,15 @@ body {
 
     .landing-info {
         padding: 40px;
+        gap: 30px;
     }
 
-    .logo-showcase img {
-        max-width: 360px;
+    .event-banner {
+        max-width: 420px;
+    }
+
+    .rd-logo-below img {
+        max-height: 110px;
     }
 }
 
@@ -316,26 +342,17 @@ body {
 
     .landing-info {
         grid-column: 1;
-        min-height: 45vh;
+        min-height: 50vh;
         padding: 40px;
+        gap: 30px;
     }
 
-    .logo-showcase {
-        padding: 20px;
+    .event-banner {
+        max-width: 380px;
     }
 
-        .logo-showcase img {
-            max-width: 320px;
-        }
-
-    .landing-info::before {
-        width: 380px;
-        height: 380px;
-    }
-
-    .landing-info::after {
-        width: 480px;
-        height: 480px;
+    .rd-logo-below img {
+        max-height: 100px;
     }
 }
 
@@ -358,18 +375,27 @@ body {
         font-size: 13px;
     }
 
-    .logo-showcase img {
-        max-width: 260px;
+    .organizer-branding {
+        margin-top: 22px;
+        padding-top: 16px;
     }
 
-    .landing-info::before {
-        width: 300px;
-        height: 300px;
+    .organizer-title {
+        font-size: 13px;
+        letter-spacing: 0.8px;
     }
 
-    .landing-info::after {
-        width: 380px;
-        height: 380px;
+    .organizer-season {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+
+    .event-banner {
+        max-width: 320px;
+    }
+
+    .rd-logo-below img {
+        max-height: 90px;
     }
 }
 
@@ -379,30 +405,30 @@ body {
     }
 
     .landing-info {
-        padding: 30px 20px;
-        min-height: 35vh;
+        padding: 25px 15px;
+        gap: 20px;
     }
 
     .landing-content h1 {
         font-size: 28px;
     }
 
-    .logo-showcase {
-        padding: 15px;
+    .organizer-title {
+        font-size: 12px;
     }
 
-        .logo-showcase img {
-            max-width: 220px;
-        }
-
-    .landing-info::before {
-        width: 240px;
-        height: 240px;
+    .organizer-season {
+        font-size: 10px;
+        letter-spacing: 1.2px;
     }
 
-    .landing-info::after {
-        width: 300px;
-        height: 300px;
+    .event-banner {
+        max-width: 280px;
+        border-width: 2px;
+    }
+
+    .rd-logo-below img {
+        max-height: 80px;
     }
 }
 
@@ -415,7 +441,11 @@ body {
             font-size: 24px;
         }
 
-    .logo-showcase img {
-        max-width: 180px;
+    .event-banner {
+        max-width: 240px;
+    }
+
+    .rd-logo-below img {
+        max-height: 70px;
     }
 }
