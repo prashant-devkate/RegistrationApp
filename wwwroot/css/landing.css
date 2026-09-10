@@ -35,7 +35,7 @@ body {
     padding: 0;
     color: var(--text-dark);
     line-height: 1.6;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 /* ========== MAIN GRID ========== */
@@ -43,24 +43,47 @@ body {
     width: 100%;
     height: 100vh;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.7fr 340px;
     position: relative;
     overflow: hidden;
     background: var(--cream-bg);
 }
 
-/* ========== LEFT PANEL ========== */
+/* ========== LEFT PANEL – Banner Hero + Content ========== */
 .landing-content {
     grid-column: 1;
-    background: linear-gradient(165deg, #fef8ee 0%, #fdf0db 40%, #f8e4c0 100%);
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    padding: 60px 50px;
+    padding: 60px 60px;
     text-align: left;
     overflow: hidden;
+    isolation: isolate;
+}
+
+/* Banner image sits behind everything, full-bleed, eye-catching */
+.banner-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+    .banner-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        animation: bannerZoom 16s ease-in-out infinite alternate;
+    }
+
+/* Gradient overlay so the text stays readable and matches theme */
+.banner-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(120deg, rgba(26, 26, 46, .92) 0%, rgba(146, 43, 33, .82) 45%, rgba(192, 57, 43, .55) 75%, rgba(192, 57, 43, .3) 100%);
 }
 
 /* Content wrapper */
@@ -71,7 +94,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100%;
 }
 
 .landing-content h1 {
@@ -79,14 +101,15 @@ body {
     font-weight: 900;
     margin-bottom: 8px;
     letter-spacing: -1px;
-    color: var(--dark-navy);
+    color: var(--white);
     line-height: 1.1;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, .35);
     animation: slideInLeft .8s cubic-bezier(.34, 1.56, .64, 1);
 }
 
     .landing-content h1 span {
         display: block;
-        color: var(--primary-red);
+        color: var(--accent-gold);
         font-style: italic;
         font-size: .75em;
         animation: fadeInDown .8s ease-out .1s both;
@@ -94,7 +117,7 @@ body {
 
 .landing-content .tagline {
     font-size: 17px;
-    color: var(--accent-orange);
+    color: var(--accent-gold);
     margin: 14px 0 20px 0;
     font-style: italic;
     font-weight: 600;
@@ -102,29 +125,30 @@ body {
 }
 
 .landing-content p {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin-bottom: 30px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, .88);
+    margin-bottom: 34px;
     font-weight: 400;
     animation: fadeInUp .8s ease-out .3s both;
     line-height: 1.75;
     max-width: 440px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, .3);
 }
 
 /* Register Button */
 .register-button {
     display: inline-block;
-    padding: 14px 44px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-dark-red) 100%);
-    color: white;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
+    color: var(--dark-navy);
     border: none;
     border-radius: 30px;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
     text-decoration: none;
     transition: all .4s cubic-bezier(.34, 1.56, .64, 1);
-    box-shadow: 0 6px 20px rgba(192, 57, 43, .3);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
     letter-spacing: .5px;
     text-transform: uppercase;
     animation: slideInUp .8s cubic-bezier(.34, 1.56, .64, 1) .4s both;
@@ -141,108 +165,82 @@ body {
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent);
         transition: left .6s ease;
     }
 
     .register-button:hover {
-        background: linear-gradient(135deg, var(--primary-dark-red) 0%, #6b1a12 100%);
+        background: linear-gradient(135deg, var(--accent-orange) 0%, var(--primary-red) 100%);
+        color: var(--white);
         transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(192, 57, 43, .4);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
     }
 
         .register-button:hover::before {
             left: 100%;
         }
 
-/* ========== Organizer Branding (below Register button) ========== */
-.organizer-branding {
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 2px solid rgba(192, 57, 43, .15);
-    animation: fadeInUp .8s ease-out .6s both;
-    max-width: 440px;
-}
-
-.organizer-title {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--dark-navy);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    line-height: 1.35;
-    margin-bottom: 8px;
-}
-
-.organizer-season {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--primary-red);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-.season-line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(192, 57, 43, .5), transparent);
-    max-width: 40px;
-}
-
-.season-text {
-    white-space: nowrap;
-}
-
-/* ========== RIGHT PANEL – Event Banner + RD Events Logo ========== */
+/* ========== RIGHT PANEL – Compact Ad Space with RD Events Logo ========== */
 .landing-info {
     grid-column: 2;
-    background: var(--white);
+    background: linear-gradient(165deg, #fffdf9 0%, #fdf0db 100%);
     position: relative;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 50px 40px;
-    gap: 30px;
-    overflow: hidden;
+    padding: 24px;
+    border-left: 1px solid rgba(192, 57, 43, .1);
 }
 
-/* Event Banner */
-.event-banner {
+.ad-space {
     width: 100%;
-    max-width: 500px;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, .18);
-    z-index: 2;
+    max-width: 260px;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .1);
+    border: 1px solid rgba(192, 57, 43, .12);
     animation: fadeInRight .9s cubic-bezier(.34, 1.56, .64, 1) .2s both;
-    border: 3px solid #f0e0c0;
 }
 
-    .event-banner img {
-        width: 100%;
+.ad-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.rd-logo {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+    .rd-logo img {
+        max-width: 100%;
+        max-height: 100px;
+        width: auto;
         height: auto;
         display: block;
-    }
-
-/* RD Events Logo below banner */
-.rd-logo-below {
-    z-index: 2;
-    animation: fadeInUp .8s ease-out .4s both;
-}
-
-    .rd-logo-below img {
-        max-height: 130px;
-        width: auto;
-        display: block;
-        margin: 0 auto;
-        filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .15));
+        filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .1));
     }
 
 /* ========== ANIMATIONS ========== */
+@keyframes bannerZoom {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.08);
+    }
+}
+
 @keyframes slideInLeft {
     from {
         opacity: 0;
@@ -304,148 +302,148 @@ body {
 }
 
 /* ========== RESPONSIVE ========== */
-@media (max-width:1200px) {
+
+/* Laptops / small desktops */
+@media (max-width: 1200px) {
+    .landing-minimal {
+        grid-template-columns: 1.6fr 280px;
+    }
+
     .landing-content h1 {
         font-size: 48px;
     }
 
     .landing-content {
-        padding: 50px 35px;
+        padding: 50px 45px;
     }
 
-    .landing-info {
-        padding: 40px;
-        gap: 30px;
+    .ad-space {
+        max-width: 220px;
+        padding: 20px 14px;
     }
 
-    .event-banner {
-        max-width: 420px;
-    }
-
-    .rd-logo-below img {
-        max-height: 110px;
+    .rd-logo img {
+        max-height: 85px;
     }
 }
 
-@media (max-width:1024px) {
+/* Tablets — stack panels, banner becomes a top hero strip */
+@media (max-width: 1024px) {
+    body {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
     .landing-minimal {
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
         height: auto;
         min-height: 100vh;
     }
 
     .landing-content {
         grid-column: 1;
-        min-height: 55vh;
-        padding: 40px 30px;
+        min-height: 60vh;
+        padding: 60px 40px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .landing-content-inner {
+        align-items: center;
+    }
+
+    .landing-content p {
+        max-width: 100%;
     }
 
     .landing-info {
         grid-column: 1;
-        min-height: 50vh;
-        padding: 40px;
-        gap: 30px;
+        border-left: none;
+        border-top: 1px solid rgba(192, 57, 43, .1);
+        padding: 24px;
     }
 
-    .event-banner {
-        max-width: 380px;
-    }
-
-    .rd-logo-below img {
-        max-height: 100px;
+    .ad-space {
+        max-width: 240px;
     }
 }
 
-@media (max-width:768px) {
+/* Mobile phones */
+@media (max-width: 768px) {
     .landing-content h1 {
-        font-size: 34px;
+        font-size: 36px;
     }
 
-    .landing-content .tagline {
-        font-size: 14px;
+    .landing-content {
+        min-height: 55vh;
+        padding: 50px 24px;
     }
 
-    .landing-content p {
-        font-size: 13px;
-        margin-bottom: 20px;
-    }
+        .landing-content .tagline {
+            font-size: 14px;
+        }
+
+        .landing-content p {
+            font-size: 14px;
+            margin-bottom: 26px;
+        }
 
     .register-button {
-        padding: 12px 30px;
+        padding: 13px 34px;
         font-size: 13px;
     }
 
-    .organizer-branding {
-        margin-top: 22px;
-        padding-top: 16px;
+    .ad-space {
+        max-width: 220px;
+        padding: 18px 14px;
     }
 
-    .organizer-title {
-        font-size: 13px;
-        letter-spacing: 0.8px;
-    }
-
-    .organizer-season {
-        font-size: 11px;
-        letter-spacing: 1.5px;
-    }
-
-    .event-banner {
-        max-width: 320px;
-    }
-
-    .rd-logo-below img {
-        max-height: 90px;
+    .rd-logo img {
+        max-height: 75px;
     }
 }
 
-@media (max-width:600px) {
+/* Small mobile phones */
+@media (max-width: 480px) {
     .landing-content {
-        padding: 25px 15px;
-    }
-
-    .landing-info {
-        padding: 25px 15px;
-        gap: 20px;
-    }
-
-    .landing-content h1 {
-        font-size: 28px;
-    }
-
-    .organizer-title {
-        font-size: 12px;
-    }
-
-    .organizer-season {
-        font-size: 10px;
-        letter-spacing: 1.2px;
-    }
-
-    .event-banner {
-        max-width: 280px;
-        border-width: 2px;
-    }
-
-    .rd-logo-below img {
-        max-height: 80px;
-    }
-}
-
-@media (max-width:400px) {
-    .landing-content {
-        padding: 15px 10px;
+        padding: 40px 18px;
     }
 
         .landing-content h1 {
-            font-size: 24px;
+            font-size: 30px;
         }
 
-    .event-banner {
-        max-width: 240px;
+        .landing-content .tagline {
+            font-size: 13px;
+        }
+
+        .landing-content p {
+            font-size: 13px;
+        }
+
+    .register-button {
+        padding: 12px 28px;
+        font-size: 12px;
     }
 
-    .rd-logo-below img {
-        max-height: 70px;
+    .ad-space {
+        max-width: 200px;
+        padding: 16px 12px;
+        gap: 10px;
+    }
+
+    .rd-logo img {
+        max-height: 65px;
+    }
+}
+
+@media (max-width: 360px) {
+    .landing-content h1 {
+        font-size: 26px;
+    }
+
+    .landing-content {
+        padding: 32px 14px;
     }
 }
