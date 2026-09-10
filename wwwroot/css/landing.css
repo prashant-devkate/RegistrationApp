@@ -63,36 +63,6 @@ body {
     overflow: hidden;
 }
 
-/* RD Events Logo – corner placement (desktop/tablet) */
-.rd-logo-corner {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    z-index: 10;
-    animation: fadeInRight .8s ease-out .2s both;
-}
-
-    .rd-logo-corner img {
-        max-height: 80px;
-        width: auto;
-        display: block;
-        border-radius: 10px;
-        padding: 8px 14px;
-        background: var(--white);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
-        border: 2px solid #f0e0c0;
-    }
-
-/* Large RD Events Logo inside right panel (if used) */
-.rd-logo-large {
-    width: 80% !important;
-    max-width: 600px !important;
-    height: auto !important;
-    object-fit: contain;
-    margin: 0 auto;
-    display: block;
-}
-
 /* Content wrapper */
 .landing-content-inner {
     position: relative;
@@ -102,24 +72,6 @@ body {
     flex-direction: column;
     justify-content: center;
     height: 100%;
-}
-
-.tournament-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, var(--accent-gold), var(--accent-orange));
-    color: var(--dark-navy);
-    font-size: 12px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    padding: 6px 14px;
-    border-radius: 30px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(243, 156, 18, .3);
-    animation: slideInLeft .7s cubic-bezier(.34, 1.56, .64, 1) both;
-    width: fit-content;
 }
 
 .landing-content h1 {
@@ -203,94 +155,71 @@ body {
             left: 100%;
         }
 
-/* ========== RIGHT PANEL – Event Image ========== */
+/* ========== RIGHT PANEL – Clean white background with RD Events Logo ========== */
 .landing-info {
     grid-column: 2;
-    background: linear-gradient(150deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: var(--white);
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 40px;
+    padding: 60px;
     overflow: hidden;
 }
 
+    /* Very subtle decorative rings behind the logo (keeps panel from feeling empty) */
     .landing-info::before {
         content: '';
         position: absolute;
-        top: -80px;
-        right: -80px;
-        width: 250px;
-        height: 250px;
-        background: radial-gradient(circle, rgba(230, 126, 34, .25) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 480px;
+        height: 480px;
         border-radius: 50%;
+        background: radial-gradient(circle, rgba(230, 126, 34, .04) 0%, rgba(192, 57, 43, .03) 40%, transparent 70%);
         pointer-events: none;
-        animation: glowPulse 4s ease-in-out infinite alternate;
     }
 
     .landing-info::after {
         content: '';
         position: absolute;
-        bottom: -60px;
-        left: -60px;
-        width: 180px;
-        height: 180px;
-        background: radial-gradient(circle, rgba(39, 174, 96, .2) 0%, transparent 70%);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 620px;
+        height: 620px;
         border-radius: 50%;
+        border: 1px solid rgba(192, 57, 43, .06);
         pointer-events: none;
-        animation: glowPulse 5s ease-in-out infinite alternate-reverse;
     }
 
-@keyframes glowPulse {
-    to {
-        transform: scale(1.15);
-        opacity: .7;
-    }
-}
-
-.event-image-frame {
-    width: 92%;
-    max-width: 520px;
-    max-height: 88vh;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, .45), 0 0 0 3px rgba(255, 255, 255, .08);
+/* Logo showcase container – perfect centering */
+.logo-showcase {
     position: relative;
     z-index: 2;
-    background: var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
     animation: fadeInRight .9s cubic-bezier(.34, 1.56, .64, 1) .2s both;
 }
 
-    .event-image-frame img {
+    .logo-showcase img {
         width: 100%;
+        max-width: 420px;
         height: auto;
-        max-height: 84vh;
         object-fit: contain;
         display: block;
+        margin: 0 auto;
+        filter: drop-shadow(0 15px 40px rgba(192, 57, 43, .12));
+        transition: transform .4s cubic-bezier(.34, 1.56, .64, 1);
     }
 
-    .event-image-frame::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .1), transparent);
-        z-index: 3;
-        pointer-events: none;
-        animation: shine 4s ease-in-out infinite;
-    }
-
-@keyframes shine {
-    0% {
-        left: -100%;
-    }
-
-    60%, 100% {
-        left: 150%;
-    }
-}
+        .logo-showcase img:hover {
+            transform: scale(1.03);
+        }
 
 /* ========== ANIMATIONS ========== */
 @keyframes slideInLeft {
@@ -364,7 +293,11 @@ body {
     }
 
     .landing-info {
-        padding: 30px;
+        padding: 40px;
+    }
+
+    .logo-showcase img {
+        max-width: 360px;
     }
 }
 
@@ -383,29 +316,29 @@ body {
 
     .landing-info {
         grid-column: 1;
-        min-height: 50vh;
-        padding: 30px;
+        min-height: 45vh;
+        padding: 40px;
     }
 
-    .event-image-frame {
-        max-height: 70vh;
+    .logo-showcase {
+        padding: 20px;
     }
 
-        .event-image-frame img {
-            max-height: 65vh;
+        .logo-showcase img {
+            max-width: 320px;
         }
 
-    .rd-logo-corner {
-        top: 20px;
-        right: 20px;
+    .landing-info::before {
+        width: 380px;
+        height: 380px;
     }
 
-        .rd-logo-corner img {
-            max-height: 60px;
-        }
+    .landing-info::after {
+        width: 480px;
+        height: 480px;
+    }
 }
 
-/* **FIX:** Make logo static and fully visible on all mobile/tablet sizes (≤768px) */
 @media (max-width:768px) {
     .landing-content h1 {
         font-size: 34px;
@@ -425,26 +358,19 @@ body {
         font-size: 13px;
     }
 
-    /* Logo becomes static, aligned left, clearly visible */
-    .rd-logo-corner {
-        position: static;
-        width: 100%;
-        margin-bottom: 12px;
-        display: flex;
-        justify-content: flex-start;
-        animation: none;
-        overflow: visible;
+    .logo-showcase img {
+        max-width: 260px;
     }
 
-        .rd-logo-corner img,
-        .rd-logo-corner .rd-logo-large {
-            width: auto !important;
-            max-width: 180px !important;
-            max-height: 50px !important;
-            height: auto !important;
-            object-fit: contain;
-            margin: 0;
-        }
+    .landing-info::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .landing-info::after {
+        width: 380px;
+        height: 380px;
+    }
 }
 
 @media (max-width:600px) {
@@ -453,17 +379,31 @@ body {
     }
 
     .landing-info {
-        padding: 20px 10px;
+        padding: 30px 20px;
+        min-height: 35vh;
     }
 
     .landing-content h1 {
         font-size: 28px;
     }
 
-    .event-image-frame {
-        width: 100%;
+    .logo-showcase {
+        padding: 15px;
     }
-    /* No logo rules here – already handled in ≤768px */
+
+        .logo-showcase img {
+            max-width: 220px;
+        }
+
+    .landing-info::before {
+        width: 240px;
+        height: 240px;
+    }
+
+    .landing-info::after {
+        width: 300px;
+        height: 300px;
+    }
 }
 
 @media (max-width:400px) {
@@ -475,13 +415,7 @@ body {
             font-size: 24px;
         }
 
-    .rd-logo-corner {
-        margin-bottom: 8px;
+    .logo-showcase img {
+        max-width: 180px;
     }
-
-        .rd-logo-corner img,
-        .rd-logo-corner .rd-logo-large {
-            max-width: 140px !important;
-            max-height: 40px !important;
-        }
 }
