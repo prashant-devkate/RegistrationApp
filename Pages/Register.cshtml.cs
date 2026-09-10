@@ -110,6 +110,11 @@ public class RegisterModel : PageModel
                 ValidationErrors["Taluka"] = "Taluka is required";
             }
 
+            if (Input.Taluka == RegistrationOptions.OtherOption && string.IsNullOrWhiteSpace(Input.CustomTaluka))
+            {
+                ValidationErrors["CustomTaluka"] = "Please specify your taluka";
+            }
+
             if (string.IsNullOrWhiteSpace(Input.TShirtSize))
             {
                 ValidationErrors["TShirtSize"] = "T-shirt size is required";
@@ -143,13 +148,24 @@ public class RegisterModel : PageModel
                 return Page();
             }
 
+            var resolvedTaluka = Input.Taluka == RegistrationOptions.OtherOption
+                ? Input.CustomTaluka!.Trim() : Input.Taluka.Trim();
+
+            if (resolvedTaluka.Length > 100)
+            {
+                ValidationErrors["CustomTaluka"] = "Taluka cannot exceed 100 characters";
+                ErrorMessage = Messages.ErrorValidationFailed;
+                await OnGetAsync();
+                return Page();
+            }
+
             // Create registration via service
             var createDto = new CreateRegistrationDto
             {
                 Name = Input.FullName.Trim(),
                 PhoneNumber = Input.PhoneNumber.Trim(),
                 Address = Input.Address.Trim(),
-                Taluka = Input.Taluka.Trim(),
+                Taluka = resolvedTaluka,
                 TShirtSize = Input.TShirtSize.Trim(),
                 CategoryId = Input.CategoryId,
                 PhotoBlobName = null,  // Will be set during blob upload later
@@ -256,6 +272,7 @@ public class RegisterModel : PageModel
     public string? PhoneNumber { get; set; }
     public string? Address { get; set; }
     public string? Taluka { get; set; }
+    public string? CustomTaluka { get; set; }
     public string? TShirtSize { get; set; }
     public int CategoryId { get; set; }
     public IFormFile? Photo { get; set; }

@@ -15,8 +15,11 @@ public static class RegistrationOptions
         "Jamkhed",
         "Patoda",
         "Shirur",
-        "Ashti"
+        "Ashti",
+        "Other"
     };
+
+    public const string OtherOption = "Other";
 
     /// <summary>
     /// Available T-shirt sizes

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using RegistrationApp.Core.Exceptions;
 using RegistrationApp.Core.Time;
 using RegistrationApp.Data;
 using RegistrationApp.Models;
@@ -110,6 +111,7 @@ public class RegistrationService : IRegistrationService
         // Validate input
         ValidateRegistrationInput(dto);
 
+        try { 
         // Verify category exists
         var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
         if (category == null)
@@ -118,8 +120,17 @@ public class RegistrationService : IRegistrationService
             throw new InvalidOperationException("Invalid category selected");
         }
 
-        try
+        var normalizedPhone = dto.PhoneNumber.Trim();
+        var duplicate = await _dbContext.Registrations
+            .AnyAsync(r => r.PhoneNumber == normalizedPhone);
+
+        if (duplicate)
         {
+            _logger.LogWarning("Duplicate registration attempt for phone {PhoneNumber}", normalizedPhone);
+            throw new DuplicateRegistrationException(
+                $"A registration with phone number {normalizedPhone} already exists.");
+        }
+
             var registration = new Registration
             {
                 Name = dto.Name.Trim(),
@@ -143,6 +154,10 @@ public class RegistrationService : IRegistrationService
                 registration.Id, registration.PhoneNumber);
 
             return registration;
+        }
+        catch (DuplicateRegistrationException)
+        {
+            throw;  
         }
         catch (Exception ex)
         {

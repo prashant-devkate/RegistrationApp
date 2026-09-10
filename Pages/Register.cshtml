@@ -102,6 +102,17 @@
                                     }
                                 }
                             </select>
+
+                            <!-- shown only when "Other" is selected -->
+                            <input type="text"
+                                   class="form-control"
+                                   id="customTaluka"
+                                   name="customTaluka"
+                                   maxlength="100"
+                                   placeholder="Please specify your taluka"
+                                   value="@Model.Input?.CustomTaluka"
+                                   style="display:none; margin-top:0.5rem;" />
+
                         </div>
                     </div>
                 </div>
@@ -150,6 +161,23 @@
 
 @section Scripts {
     <script>
+        // Taluka "Other" toggle
+        (function () {
+            const select = document.getElementById('taluka');
+            const custom = document.getElementById('customTaluka');
+
+            function toggle() {
+                const show = select.value === 'Other';
+                custom.style.display = show ? '' : 'none';
+                if (!show) {
+                    custom.value = '';   // clear stale value when switching away
+                }
+            }
+
+            select.addEventListener('change', toggle);
+            toggle();   // run on load so validation-failure re-renders keep the state
+        })();
+
         // Toast notification system with timer bar
         const showToast = (message, type = 'info', duration = 10000) => {
             const container = document.getElementById('toast-container');
