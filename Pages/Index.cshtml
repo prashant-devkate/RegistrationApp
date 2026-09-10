@@ -1,7 +1,7 @@
 @page
 @{
     Layout = "_BlankLayout";
-    ViewData["Title"] = "Cricket Tournament | RD Events";
+    ViewData["Title"] = "Chinchpur Pangul Premier League 2026 | RD Events";
 }
 
 @section Styles {
@@ -9,26 +9,29 @@
 }
 
 <div class="landing-minimal">
-    <!-- Left Panel: Banner Hero + Content -->
+
+    <!-- ===================== MAIN: Banner as full-bleed background ===================== -->
     <div class="landing-content">
-        <!-- Event Banner used as eye-catching hero background -->
+
         <div class="banner-bg">
-            <img src="~/images/chinchpur-pangul-banner.jpeg" alt="Chinchpur Pangul Premier League 2026 - Season 2" />
+            <img src="~/images/chinchpur-pangul-banner.jpeg"
+                 alt="Chinchpur Pangul Premier League 2026 – Season 2" />
+            <div class="banner-shade"></div>
         </div>
-        <div class="banner-overlay"></div>
 
-        <div class="landing-content-inner">
-            <h1>
-                Cricket
-                <span>More than just a Sport</span>
-            </h1>
-            <p>Join thousands of cricket enthusiasts and register for our premier tournament. Experience the passion, skill, and spirit of the game.</p>
+        <a href="/register" class="cta-block" aria-label="Register now for auction">
+            Register Now For Auction
+        </a>
 
-            <a href="/register" class="register-button">Register Now For Auction</a>
-        </div>
+        <!-- SEO / accessibility only -->
+        <h1 class="sr-only">Chinchpur Pangul Premier League 2026 – Season 2</h1>
+        <p class="sr-only">
+            Join thousands of cricket enthusiasts and register for our premier tournament.
+        </p>
+
     </div>
 
-    <!-- Right Panel: Compact Ad Space with RD Events Logo -->
+    <!-- ===================== SIDEBAR: RD Events Logo ===================== -->
     <div class="landing-info">
         <div class="ad-space">
             <span class="ad-label">Presented By</span>
@@ -37,4 +40,5 @@
             </div>
         </div>
     </div>
+
 </div>

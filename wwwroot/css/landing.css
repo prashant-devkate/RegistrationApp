@@ -1,16 +1,15 @@
-/* ===== Cricket Tournament Landing – Indian Theme (RD Events Match) ===== */
+/* ===== Cricket Tournament Landing – RD Events ===== */
 
 :root {
     --primary-red: #c0392b;
     --primary-dark-red: #922b21;
     --accent-orange: #e67e22;
     --accent-gold: #f39c12;
-    --accent-green: #27ae60;
+    --accent-green: #16a34a;
+    --accent-green-dark: #15803d;
     --dark-navy: #1a1a2e;
-    --dark-charcoal: #2c3e50;
     --cream-bg: #fef8ee;
     --white: #ffffff;
-    --text-dark: #1f2937;
     --text-secondary: #6b7280;
 }
 
@@ -32,38 +31,43 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 0;
-    color: var(--text-dark);
+    color: #1f2937;
     line-height: 1.6;
     overflow-x: hidden;
 }
 
-/* ========== MAIN GRID ========== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ========== MAIN GRID ==========
+   Main panel = 1fr, sidebar = 380px (wider so RD logo has room).
+   Increase the sidebar number to shrink the main panel further. */
 .landing-minimal {
     width: 100%;
     height: 100vh;
     display: grid;
-    grid-template-columns: 1.7fr 340px;
-    position: relative;
+    grid-template-columns: 1fr 380px;
     overflow: hidden;
-    background: var(--cream-bg);
+    background: var(--dark-navy);
 }
 
-/* ========== LEFT PANEL – Banner Hero + Content ========== */
+/* ========== MAIN PANEL: banner as full-bleed background ========== */
 .landing-content {
-    grid-column: 1;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 60px 60px;
-    text-align: left;
     overflow: hidden;
     isolation: isolate;
+    min-width: 0; /* lets grid shrink the panel cleanly */
 }
 
-/* Banner image sits behind everything, full-bleed, eye-catching */
 .banner-bg {
     position: absolute;
     inset: 0;
@@ -74,218 +78,203 @@ body {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        object-position: center;
-        animation: bannerZoom 16s ease-in-out infinite alternate;
-    }
-
-/* Gradient overlay so the text stays readable and matches theme */
-.banner-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    background: linear-gradient(120deg, rgba(26, 26, 46, .92) 0%, rgba(146, 43, 33, .82) 45%, rgba(192, 57, 43, .55) 75%, rgba(192, 57, 43, .3) 100%);
-}
-
-/* Content wrapper */
-.landing-content-inner {
-    position: relative;
-    z-index: 2;
-    max-width: 550px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.landing-content h1 {
-    font-size: 58px;
-    font-weight: 900;
-    margin-bottom: 8px;
-    letter-spacing: -1px;
-    color: var(--white);
-    line-height: 1.1;
-    text-shadow: 0 4px 18px rgba(0, 0, 0, .35);
-    animation: slideInLeft .8s cubic-bezier(.34, 1.56, .64, 1);
-}
-
-    .landing-content h1 span {
+        object-position: center 42%; /* keeps the "CHINCHPUR PANGUL…" title centered */
         display: block;
-        color: var(--accent-gold);
-        font-style: italic;
-        font-size: .75em;
-        animation: fadeInDown .8s ease-out .1s both;
+        animation: bannerIn 1.2s ease-out;
     }
 
-.landing-content .tagline {
-    font-size: 17px;
-    color: var(--accent-gold);
-    margin: 14px 0 20px 0;
-    font-style: italic;
-    font-weight: 600;
-    animation: fadeInUp .8s ease-out .2s both;
+/* Bottom-only gradient so the CTA stays readable — no full dark overlay */
+.banner-shade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 38%;
+    background: linear-gradient(to top, rgba(0, 0, 0, .72) 0%, rgba(0, 0, 0, .35) 45%, transparent 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
-.landing-content p {
-    font-size: 16px;
-    color: rgba(255, 255, 255, .88);
-    margin-bottom: 34px;
-    font-weight: 400;
-    animation: fadeInUp .8s ease-out .3s both;
-    line-height: 1.75;
-    max-width: 440px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, .3);
-}
-
-/* Register Button */
-.register-button {
-    display: inline-block;
-    padding: 16px 48px;
-    background: linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-orange) 100%);
-    color: var(--dark-navy);
-    border: none;
-    border-radius: 30px;
+/* ========== CTA — high-contrast action button ========== */
+.cta-block {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px 48px;
+    border-radius: 999px;
+    /* Vivid solid green — pops against the gold/red banner */
+    background: var(--accent-green);
+    color: var(--white);
+    font-family: 'Georgia', serif;
     font-size: 15px;
-    font-weight: 800;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all .4s cubic-bezier(.34, 1.56, .64, 1);
-    box-shadow: 0 10px 28px rgba(0, 0, 0, .35);
-    letter-spacing: .5px;
+    font-weight: 900;
+    letter-spacing: 1.4px;
     text-transform: uppercase;
-    animation: slideInUp .8s cubic-bezier(.34, 1.56, .64, 1) .4s both;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 2px solid var(--white);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .6), 0 0 0 6px rgba(22, 163, 74, .28);
+    cursor: pointer;
+    transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), background .25s ease, box-shadow .25s ease;
+    animation: ctaIn .8s cubic-bezier(.34, 1.56, .64, 1) .35s both;
+}
+
+    .cta-block:hover,
+    .cta-block:focus-visible {
+        background: var(--accent-green-dark);
+        transform: translateX(-50%) translateY(-4px) scale(1.03);
+        box-shadow: 0 20px 46px rgba(0, 0, 0, .7), 0 0 0 8px rgba(22, 163, 74, .45);
+        outline: none;
+    }
+
+    /* Subtle pulse ring drawing the eye */
+    .cta-block::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, .35);
+        pointer-events: none;
+        animation: ctaPulse 2.4s ease-out infinite;
+    }
+
+@keyframes ctaPulse {
+    0% {
+        opacity: .8;
+        transform: scale(1);
+    }
+
+    70% {
+        opacity: 0;
+        transform: scale(1.12);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.12);
+    }
+}
+
+/* ========== SIDEBAR: RD Events logo ========== */
+.landing-info {
+    grid-column: 2;
+    background: radial-gradient(circle at 50% 20%, #fffdf9 0%, #fdf0db 60%, #f8e2ba 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 36px 28px;
+    border-left: 1px solid rgba(192, 57, 43, .12);
     position: relative;
-    z-index: 4;
-    width: fit-content;
     overflow: hidden;
 }
 
-    .register-button::before {
-        content: '';
+    /* Decorative corner accents */
+    .landing-info::before,
+    .landing-info::after {
+        content: "";
         position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .5), transparent);
-        transition: left .6s ease;
+        width: 120px;
+        height: 120px;
+        border: 2px solid rgba(192, 57, 43, .12);
+        pointer-events: none;
     }
 
-    .register-button:hover {
-        background: linear-gradient(135deg, var(--accent-orange) 0%, var(--primary-red) 100%);
-        color: var(--white);
-        transform: translateY(-4px);
-        box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
+    .landing-info::before {
+        top: -60px;
+        left: -60px;
+        border-radius: 50%;
     }
 
-        .register-button:hover::before {
-            left: 100%;
-        }
-
-/* ========== RIGHT PANEL – Compact Ad Space with RD Events Logo ========== */
-.landing-info {
-    grid-column: 2;
-    background: linear-gradient(165deg, #fffdf9 0%, #fdf0db 100%);
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 24px;
-    border-left: 1px solid rgba(192, 57, 43, .1);
-}
+    .landing-info::after {
+        bottom: -60px;
+        right: -60px;
+        border-radius: 50%;
+    }
 
 .ad-space {
     width: 100%;
-    max-width: 260px;
+    max-width: 320px;
     background: var(--white);
-    border-radius: 16px;
-    padding: 24px 18px;
+    border-radius: 22px;
+    padding: 40px 30px 34px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-    box-shadow: 0 12px 34px rgba(0, 0, 0, .1);
-    border: 1px solid rgba(192, 57, 43, .12);
+    gap: 22px;
+    box-shadow: 0 18px 46px rgba(192, 57, 43, .14), 0 4px 14px rgba(0, 0, 0, .05);
+    border: 1px solid rgba(192, 57, 43, .14);
+    position: relative;
     animation: fadeInRight .9s cubic-bezier(.34, 1.56, .64, 1) .2s both;
 }
 
+    /* Thin gold rule above the label */
+    .ad-space::before {
+        content: "";
+        position: absolute;
+        top: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 46px;
+        height: 3px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, var(--accent-gold), var(--accent-orange));
+    }
+
 .ad-label {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 3.5px;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    color: var(--primary-dark-red);
+    margin-top: 6px;
 }
 
 .rd-logo {
     width: 100%;
     display: flex;
     justify-content: center;
+    align-items: center;
+    padding: 4px 0;
 }
 
+    /* Bigger, crisper logo */
     .rd-logo img {
-        max-width: 100%;
-        max-height: 100px;
-        width: auto;
+        width: 100%;
+        max-width: 240px;
         height: auto;
+        max-height: 160px;
+        object-fit: contain;
         display: block;
-        filter: drop-shadow(0 6px 16px rgba(0, 0, 0, .1));
+        filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .12));
     }
 
 /* ========== ANIMATIONS ========== */
-@keyframes bannerZoom {
+@keyframes bannerIn {
     from {
+        opacity: 0;
+        transform: scale(1.06);
+    }
+
+    to {
+        opacity: 1;
         transform: scale(1);
     }
-
-    to {
-        transform: scale(1.08);
-    }
 }
 
-@keyframes slideInLeft {
+@keyframes ctaIn {
     from {
         opacity: 0;
-        transform: translateX(-50px) translateY(-10px);
+        transform: translateX(-50%) translateY(28px);
     }
 
     to {
         opacity: 1;
-        transform: translateX(0) translateY(0);
-    }
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
     }
 }
 
@@ -304,31 +293,46 @@ body {
 /* ========== RESPONSIVE ========== */
 
 /* Laptops / small desktops */
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
     .landing-minimal {
-        grid-template-columns: 1.6fr 280px;
+        grid-template-columns: 1fr 330px;
     }
 
-    .landing-content h1 {
-        font-size: 48px;
-    }
-
-    .landing-content {
-        padding: 50px 45px;
+    .cta-block {
+        padding: 13px 40px;
+        font-size: 14px;
     }
 
     .ad-space {
-        max-width: 220px;
-        padding: 20px 14px;
+        max-width: 290px;
+        padding: 34px 24px 28px;
+        gap: 18px;
     }
 
     .rd-logo img {
-        max-height: 85px;
+        max-width: 210px;
+        max-height: 140px;
     }
 }
 
-/* Tablets & below — stack panels; banner shown at its own aspect ratio
-   (no crop, no overlay) with text moved into a solid panel underneath */
+@media (max-width: 1100px) {
+    .landing-minimal {
+        grid-template-columns: 1fr 300px;
+    }
+
+    .ad-space {
+        max-width: 260px;
+        padding: 30px 22px 26px;
+    }
+
+    .rd-logo img {
+        max-width: 190px;
+        max-height: 130px;
+    }
+}
+
+/* Tablets & below — stack panels.
+   Banner keeps its natural ratio, so the title can never be cropped. */
 @media (max-width: 1024px) {
     body {
         overflow-x: hidden;
@@ -340,140 +344,99 @@ body {
         grid-template-rows: auto auto;
         height: auto;
         min-height: 100vh;
+        background: var(--cream-bg);
     }
 
     .landing-content {
-        grid-column: 1;
-        display: block;
-        min-height: 0;
-        padding: 0;
-        overflow: visible;
-    }
-
-    /* Banner becomes a normal, fully-visible image block instead of a
-       full-bleed cropped background */
-    .banner-bg {
-        position: relative;
-        inset: auto;
+        /* Match the banner's aspect ratio so cover doesn't crop anything */
+        aspect-ratio: 2 / 3;
+        max-height: 88vh;
         width: 100%;
-        aspect-ratio: 16 / 9;
-        overflow: hidden;
     }
 
-        .banner-bg img {
-            position: static;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            animation: none;
-        }
-
-    /* No dark overlay needed once text moves off the image */
-    .banner-overlay {
-        display: none;
+    .banner-bg img {
+        object-position: center center;
+        animation: none;
     }
 
-    .landing-content-inner {
-        position: relative;
-        z-index: 2;
-        max-width: 100%;
-        align-items: center;
-        text-align: center;
-        background: linear-gradient(165deg, var(--dark-navy) 0%, var(--primary-dark-red) 100%);
-        padding: 44px 40px;
+    .banner-shade {
+        height: 45%;
     }
 
-    .landing-content p {
-        max-width: 100%;
+    .cta-block {
+        bottom: 7%;
+        padding: 14px 42px;
+        font-size: 14px;
     }
 
     .landing-info {
         grid-column: 1;
         border-left: none;
-        border-top: 1px solid rgba(192, 57, 43, .1);
-        padding: 24px;
+        border-top: 1px solid rgba(192, 57, 43, .12);
+        padding: 40px 24px;
     }
 
     .ad-space {
+        max-width: 320px;
+        padding: 40px 30px 34px;
+    }
+
+    .rd-logo img {
         max-width: 240px;
+        max-height: 160px;
     }
 }
 
 /* Mobile phones */
 @media (max-width: 768px) {
-    .landing-content h1 {
-        font-size: 34px;
-    }
-
-    .landing-content-inner {
-        padding: 36px 24px;
-    }
-
-    .landing-content .tagline {
-        font-size: 14px;
-    }
-
-    .landing-content p {
-        font-size: 14px;
-        margin-bottom: 26px;
-    }
-
-    .register-button {
-        padding: 13px 34px;
+    .cta-block {
+        bottom: 6%;
+        padding: 12px 32px;
         font-size: 13px;
     }
 
     .ad-space {
-        max-width: 220px;
-        padding: 18px 14px;
+        max-width: 300px;
+        padding: 36px 26px 30px;
+        gap: 18px;
     }
 
     .rd-logo img {
-        max-height: 75px;
+        max-width: 220px;
+        max-height: 150px;
     }
 }
 
 /* Small mobile phones */
 @media (max-width: 480px) {
-    .landing-content-inner {
-        padding: 30px 18px;
-    }
-
-    .landing-content h1 {
-        font-size: 28px;
-    }
-
-    .landing-content .tagline {
-        font-size: 13px;
-    }
-
-    .landing-content p {
-        font-size: 13px;
-    }
-
-    .register-button {
-        padding: 12px 28px;
+    .cta-block {
+        padding: 11px 26px;
         font-size: 12px;
+        letter-spacing: .8px;
+        bottom: 5%;
+    }
+
+    .banner-shade {
+        height: 50%;
+    }
+
+    .landing-info {
+        padding: 32px 20px;
     }
 
     .ad-space {
-        max-width: 200px;
-        padding: 16px 12px;
-        gap: 10px;
+        max-width: 260px;
+        padding: 32px 22px 26px;
+        gap: 16px;
+    }
+
+    .ad-label {
+        font-size: 10px;
+        letter-spacing: 3px;
     }
 
     .rd-logo img {
-        max-height: 65px;
-    }
-}
-
-@media (max-width: 360px) {
-    .landing-content h1 {
-        font-size: 24px;
-    }
-
-    .landing-content-inner {
-        padding: 26px 14px;
+        max-width: 200px;
+        max-height: 130px;
     }
 }
