@@ -27,6 +27,12 @@ public class DashboardModel : PageModel
 
     public int CurrentPage { get; set; } = 1;
     public int TotalPages { get; set; }
+
+    // Bound from the query string so the view can highlight the active tab
+    // and keep the search box populated after a search.
+    public string? StatusFilter { get; set; }
+    public string? SearchTerm { get; set; }
+
     public DashboardModel(ApplicationDbContext dbContext, IBlobStorageService blobStorageService, IConfiguration configuration)
     {
         _dbContext = dbContext;
@@ -34,11 +40,14 @@ public class DashboardModel : PageModel
         _configuration = configuration;
     }
 
-    public async Task OnGetAsync([FromQuery] int page = 1)
+    public async Task OnGetAsync([FromQuery] int page = 1, [FromQuery] string? status = null, [FromQuery] string? q = null)
     {
         CurrentPage = page < 1 ? 1 : page;
+        StatusFilter = status;
+        SearchTerm = q;
 
-        // Calculate summary statistics
+        // Summary cards always reflect the GRAND totals, regardless of the active tab/search,
+        // so they stay a stable reference point no matter what's currently filtered in the table.
         TotalRegistrations = await _dbContext.Registrations.CountAsync();
         ConfirmedRegistrations = await _dbContext.Registrations
             .CountAsync(r => r.Status == RegistrationStatus.Confirmed);
@@ -47,14 +56,30 @@ public class DashboardModel : PageModel
         FailedPaymentRegistrations = await _dbContext.Registrations
             .CountAsync(r => r.Status == RegistrationStatus.PaymentFailed);
 
-        TotalPages = (int)Math.Ceiling(TotalRegistrations / (double)PageSize);
+        // Build the filtered query for the table itself
+        var query = _dbContext.Registrations.Include(r => r.Payments).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status) && Enum.TryParse<RegistrationStatus>(status, out var parsedStatus))
+        {
+            query = query.Where(r => r.Status == parsedStatus);
+        }
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var term = q.Trim();
+            query = query.Where(r => r.Name.Contains(term) || r.PhoneNumber.Contains(term));
+        }
+
+        // Pagination is based on the FILTERED count, not the grand total,
+        // otherwise a tab with few results would show broken empty pages.
+        var filteredCount = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling(filteredCount / (double)PageSize);
         if (TotalPages > 0 && CurrentPage > TotalPages)
         {
             CurrentPage = TotalPages;
         }
 
-        var registrations = await _dbContext.Registrations
-            .Include(r => r.Payments)
+        var registrations = await query
             .OrderByDescending(r => r.CreatedAt)
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize)
