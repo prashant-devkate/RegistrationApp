@@ -101,7 +101,7 @@ public class RegistrationService : IRegistrationService
 
     /// <summary>
     /// Create a new registration with PaymentPending status
-    /// Validates all input and ensures no duplicate email registrations
+    /// Validates all inputs; duplicate phone number are allowed.
     /// </summary>
     public async Task<Registration> CreateRegistrationAsync(CreateRegistrationDto dto)
     {
