@@ -120,17 +120,6 @@ public class RegistrationService : IRegistrationService
             throw new InvalidOperationException("Invalid category selected");
         }
 
-        var normalizedPhone = dto.PhoneNumber.Trim();
-        var duplicate = await _dbContext.Registrations
-            .AnyAsync(r => r.PhoneNumber == normalizedPhone);
-
-        if (duplicate)
-        {
-            _logger.LogWarning("Duplicate registration attempt for phone {PhoneNumber}", normalizedPhone);
-            throw new DuplicateRegistrationException(
-                $"A registration with phone number {normalizedPhone} already exists.");
-        }
-
             var registration = new Registration
             {
                 Name = dto.Name.Trim(),
@@ -154,10 +143,6 @@ public class RegistrationService : IRegistrationService
                 registration.Id, registration.PhoneNumber);
 
             return registration;
-        }
-        catch (DuplicateRegistrationException)
-        {
-            throw;  
         }
         catch (Exception ex)
         {

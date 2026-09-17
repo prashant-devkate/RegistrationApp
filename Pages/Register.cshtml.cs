@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using RegistrationApp.Core.Constants;
-using RegistrationApp.Core.Exceptions;
 using RegistrationApp.Models;
 using RegistrationApp.Services;
 
@@ -150,7 +149,7 @@ public class RegisterModel : PageModel
             }
 
             var resolvedTaluka = Input.Taluka == RegistrationOptions.OtherOption
-                ? Input.CustomTaluka!.Trim() : Input.Taluka.Trim();
+            ? Input.CustomTaluka!.Trim() : Input.Taluka.Trim();
 
             if (resolvedTaluka.Length > 100)
             {
@@ -188,14 +187,6 @@ public class RegisterModel : PageModel
 
             // Redirect to payment page with registration ID
             return RedirectToPage("/Payment", new { id = registration.Id });
-        }
-        catch (DuplicateRegistrationException ex)
-        {
-            _logger.LogWarning(ex, "Duplicate registration attempt for phone {PhoneNumber}", Input?.PhoneNumber);
-            ValidationErrors["PhoneNumber"] = Messages.ErrorDuplicatePhoneNumber;
-            ErrorMessage = Messages.ErrorDuplicatePhoneNumber;
-            await OnGetAsync();
-            return Page();
         }
         catch (ArgumentException ex)
         {
