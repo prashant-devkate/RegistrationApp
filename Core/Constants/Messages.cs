@@ -135,6 +135,11 @@ public static class Messages
     public const string ErrorDuplicateEmail = "An active registration with this email address already exists. Please use a different email or log in to your existing registration.";
 
     /// <summary>
+    /// Duplicate phone number - registration already exists
+    /// </summary>
+    public const string ErrorDuplicatePhoneNumber = "A registration with this phone number already exists. Please use a different phone number or contact support.";
+
+    /// <summary>
     /// Payment signature verification failed
     /// </summary>
     public const string ErrorPaymentSignatureVerification = "Payment signature verification failed. Please contact support if this issue persists.";

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using RegistrationApp.Core.Constants;
+using RegistrationApp.Core.Exceptions;
 using RegistrationApp.Models;
 using RegistrationApp.Services;
 
@@ -18,9 +19,9 @@ public class RegisterModel : PageModel
     private readonly ILogger<RegisterModel> _logger;
 
     public RegisterModel(
-        IRegistrationService registrationService,
-        IBlobStorageService blobStorageService,
-        ILogger<RegisterModel> logger)
+    IRegistrationService registrationService,
+    IBlobStorageService blobStorageService,
+    ILogger<RegisterModel> logger)
     {
         _registrationService = registrationService;
         _blobStorageService = blobStorageService;
@@ -168,7 +169,7 @@ public class RegisterModel : PageModel
                 Taluka = resolvedTaluka,
                 TShirtSize = Input.TShirtSize.Trim(),
                 CategoryId = Input.CategoryId,
-                PhotoBlobName = null,  // Will be set during blob upload later
+                PhotoBlobName = null, // Will be set during blob upload later
                 AadharFrontBlobName = null,
                 AadharBackBlobName = null
             };
@@ -176,10 +177,10 @@ public class RegisterModel : PageModel
             var registration = await _registrationService.CreateRegistrationAsync(createDto);
 
             _logger.LogInformation(
-                "Registration created successfully. RegistrationId: {RegistrationId}, Phone: {PhoneNumber}, Category: {CategoryId}",
-                registration.Id,
-                registration.PhoneNumber,
-                registration.CategoryId
+            "Registration created successfully. RegistrationId: {RegistrationId}, Phone: {PhoneNumber}, Category: {CategoryId}",
+            registration.Id,
+            registration.PhoneNumber,
+            registration.CategoryId
             );
 
             // Upload images to Azure Blob Storage and persist their names + URLs
@@ -187,6 +188,29 @@ public class RegisterModel : PageModel
 
             // Redirect to payment page with registration ID
             return RedirectToPage("/Payment", new { id = registration.Id });
+        }
+        catch (DuplicateRegistrationException ex)
+        {
+            _logger.LogWarning(ex, "Duplicate registration attempt for phone {PhoneNumber}", Input?.PhoneNumber);
+            ValidationErrors["PhoneNumber"] = Messages.ErrorDuplicatePhoneNumber;
+            ErrorMessage = Messages.ErrorDuplicatePhoneNumber;
+            await OnGetAsync();
+            return Page();
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid registration input");
+            ErrorMessage = ex.Message;
+            await OnGetAsync();
+            return Page();
+        }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("Invalid category", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning(ex, "Invalid category selected: {CategoryId}", Input?.CategoryId);
+            ValidationErrors["CategoryId"] = Messages.ErrorInvalidCategory;
+            ErrorMessage = Messages.ErrorInvalidCategory;
+            await OnGetAsync();
+            return Page();
         }
         catch (InvalidOperationException ex) when (ex.Message.Contains("Connection"))
         {
@@ -241,10 +265,10 @@ public class RegisterModel : PageModel
             if (photoBlob != null || frontBlob != null || backBlob != null)
             {
                 await _registrationService.UpdateImagesAsync(
-                    registrationId,
-                    photoBlob, photoUrl,
-                    frontBlob, frontUrl,
-                    backBlob, backUrl);
+                registrationId,
+                photoBlob, photoUrl,
+                frontBlob, frontUrl,
+                backBlob, backUrl);
             }
         }
         catch (Exception ex)
@@ -261,12 +285,12 @@ public class RegisterModel : PageModel
         return (blobName, url);
     }
 
-    }
+}
 
-    /// <summary>
-    /// Form input model for registration
-    /// </summary>
-    public class RegistrationFormInput
+/// <summary>
+/// Form input model for registration
+/// </summary>
+public class RegistrationFormInput
 {
     public string? FullName { get; set; }
     public string? PhoneNumber { get; set; }
