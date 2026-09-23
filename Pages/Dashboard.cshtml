@@ -33,10 +33,39 @@
             <h1>Registration Dashboard</h1>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <form method="post" asp-page-handler="Reconcile"
+                  asp-route-p="@Model.CurrentPage" asp-route-status="@Model.StatusFilter" asp-route-q="@Model.SearchTerm"
+                  style="display:inline;">
+                <button type="submit" class="btn-icon btn-icon-export" title="Check pending payments against Razorpay" aria-label="Reconcile payments">&#128260;</button>
+            </form>
             <a asp-page-handler="Export" class="btn-icon btn-icon-export" title="Export to Excel" aria-label="Export to Excel">&#128229;</a>
             <a href="/logout" class="btn-icon btn-icon-logout" title="Logout" aria-label="Logout">&#8618;</a>
         </div>
     </div>
+
+    @if (!string.IsNullOrEmpty(Model.ReconcileMessage))
+    {
+        <div role="status"
+             style="margin-bottom:16px; padding:12px 16px; border-radius:6px; font-size:14px; @(Model.ReconcileFailed ? "background:#fdecea; color:#a32; border:1px solid #f5c6cb;" : "background:#eaf7ed; color:#256029; border:1px solid #c3e6cb;")">
+            @Model.ReconcileMessage
+        </div>
+    }
+
+    @if (Model.ReconcileState.IsRunning)
+    {
+        <div role="status"
+             style="margin-bottom:16px; padding:12px 16px; border-radius:6px; font-size:14px; background:#eef4fd; color:#1b4b8a; border:1px solid #c5d9f5;">
+            Reconciliation is running (@Model.ReconcileState.LastTrigger)&hellip; refresh to see the result.
+        </div>
+    }
+    else if (Model.ReconcileState.LastRunAt.HasValue)
+    {
+        <div style="margin-bottom:16px; font-size:13px; color:#666;">
+            Last reconciliation (@Model.ReconcileState.LastTrigger):
+            @Model.ReconcileState.LastRunAt.Value.ToString("dd MMM yyyy HH:mm") &mdash;
+            <span style="@(Model.ReconcileState.LastRunFailed ? "color:#a32;" : "color:#256029;")">@Model.ReconcileState.LastMessage</span>
+        </div>
+    }
 
     <!-- Summary Cards -->
     <div class="summary-grid">
