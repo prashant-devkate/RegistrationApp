@@ -88,6 +88,16 @@ builder.Services.AddControllers();
 // Add HttpClient for Razorpay API calls
 builder.Services.AddHttpClient<PaymentService>();
 
+// Payment reconciliation: recovers payments captured by Razorpay whose webhook never
+// arrived or was rejected, so they are not left stuck in a pending status
+builder.Services.Configure<PaymentReconciliationOptions>(
+    builder.Configuration.GetSection(PaymentReconciliationOptions.SectionName));
+builder.Services.AddHttpClient(nameof(PaymentReconciliationService));
+builder.Services.AddScoped<IPaymentReconciliationService, PaymentReconciliationService>();
+builder.Services.AddSingleton<PaymentReconciliationRunner>();
+builder.Services.AddHostedService<PaymentReconciliationWorker>();
+builder.Services.AddHostedService<PaymentReconciliationBackgroundService>();
+
 var app = builder.Build();
 
 // Apply database migrations on startup

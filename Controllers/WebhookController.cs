@@ -22,15 +22,18 @@ namespace RegistrationApp.Controllers;
 public class WebhookController : ControllerBase
 {
     private readonly IRegistrationService _registrationService;
+    private readonly IPaymentReconciliationService _reconciliationService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<WebhookController> _logger;
 
     public WebhookController(
         IRegistrationService registrationService,
+        IPaymentReconciliationService reconciliationService,
         IConfiguration configuration,
         ILogger<WebhookController> logger)
     {
         _registrationService = registrationService ?? throw new ArgumentNullException(nameof(registrationService));
+        _reconciliationService = reconciliationService ?? throw new ArgumentNullException(nameof(reconciliationService));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -201,37 +204,53 @@ public class WebhookController : ControllerBase
                 return NotFound("Registration not found");
             }
 
-            // Get category for fee validation
-            var categories = await _registrationService.GetCategoriesAsync();
-            var category = categories.FirstOrDefault(c => c.Id == registration.CategoryId);
+            // Validate amount against the amount stored on the order itself, not the current
+            // fee constant. The fee can change over time, and comparing against the constant
+            // silently rejects webhooks for orders created under a previous fee.
+            var expectedAmountInPaise = (long)paymentRecord.AmountInPaise;
 
-            if (category == null)
-            {
-                _logger.LogWarning("Category not found for RegistrationId: {RegistrationId}", registrationId);
-                return BadRequest("Category not found");
-            }
-
-            // Validate amount (Razorpay amount is in paise, our fee is in rupees, so multiply by 100)
-            if (payment.Amount != (long)(ApplicationConstants.RegistrationFee * 100))
+            if (payment.Amount != expectedAmountInPaise)
             {
                 _logger.LogWarning(
                     "Payment amount mismatch. RegistrationId: {RegistrationId}, Expected: {Expected}, Received: {Received}",
                     registrationId,
-                    ApplicationConstants.RegistrationFee * 100,
+                    expectedAmountInPaise,
                     payment.Amount
                 );
                 return BadRequest("Payment amount mismatch");
             }
 
-            // Validate currency
-            if (payment.Currency != "INR")
+            // Validate currency against the currency recorded on the order
+            if (!string.Equals(payment.Currency, paymentRecord.Currency, StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogWarning(
-                    "Payment currency mismatch. RegistrationId: {RegistrationId}, Currency: {Currency}",
+                    "Payment currency mismatch. RegistrationId: {RegistrationId}, Expected: {Expected}, Received: {Currency}",
                     registrationId,
+                    paymentRecord.Currency,
                     payment.Currency
                 );
                 return BadRequest("Payment currency mismatch");
+            }
+
+            // Record the status Razorpay actually reported for this payment. The event name
+            // is only a fallback for a missing payload status - it is never allowed to
+            // override the payload, so we cannot record a capture that did not happen.
+            var webhookPaymentStatus = RazorpayStatusMapper.Map(payment.Status)
+                ?? (webhook.Event == "payment.captured" ? PaymentStatus.Captured : null);
+
+            if (webhookPaymentStatus == null)
+            {
+                _logger.LogWarning(
+                    "Unrecognised Razorpay payment status '{Status}' for OrderId: {OrderId}. Leaving local status unchanged.",
+                    payment.Status, payment.OrderId);
+            }
+            else
+            {
+                await _registrationService.UpdatePaymentAfterWebhookAsync(
+                    paymentRecord.Id,
+                    payment.Id,
+                    webhookPaymentStatus.Value
+                );
             }
 
             // Check if registration is already confirmed (idempotency)
@@ -241,23 +260,10 @@ public class WebhookController : ControllerBase
                 return Ok(new { status = "already_confirmed", message = "Registration is already confirmed" });
             }
 
-            // Confirm registration
+            // Confirm registration on either authorize or capture, matching the original
+            // behaviour. Any payment that never reaches captured is surfaced by the
+            // reconciliation job rather than by blocking confirmation here.
             await _registrationService.ConfirmRegistrationAsync(registrationId);
-
-            //Update payment status in database
-            try
-            {
-                await _registrationService.UpdatePaymentAfterWebhookAsync(
-                    paymentRecord.Id,
-                    payment.Id,
-                    PaymentStatus.Captured
-                );
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating payment status after webhook confirmation");
-                // Don't fail the webhook response if payment update fails (registration is already confirmed)
-            }
 
             _logger.LogInformation(
                 "Registration confirmed via webhook. RegistrationId: {RegistrationId}, PaymentId: {PaymentId}, RazorpayOrderId: {OrderId}, Amount: {Amount}",
@@ -391,19 +397,25 @@ public class WebhookController : ControllerBase
                 return NotFound(new { status = "error", message = "Registration not found" });
             }
 
+            // Never take the client's word for the payment status. Ask Razorpay directly
+            // and record whatever it reports; the signature is persisted alongside it.
+            var resolvedStatus = await _reconciliationService.ReconcilePaymentAsync(
+                paymentRecord.Id,
+                confirmationData.RazorpaySignature);
+
+            if (resolvedStatus == null)
+            {
+                _logger.LogWarning(
+                    "Could not verify payment with Razorpay. PaymentId: {PaymentId}, OrderId: {OrderId}. Leaving status unchanged; reconciliation job will retry.",
+                    paymentRecord.Id, confirmationData.RazorpayOrderId);
+            }
+
             // Check if already confirmed
             if (registration.Status == RegistrationStatus.Confirmed)
             {
                 _logger.LogInformation("Registration {RegistrationId} already confirmed", registration.Id);
                 return Ok(new { status = "success", message = "Registration already confirmed", registrationId = registration.Id });
             }
-
-            // Update payment record with payment ID
-            paymentRecord.RazorpayPaymentId = confirmationData.RazorpayPaymentId;
-            paymentRecord.RazorpaySignature = confirmationData.RazorpaySignature;
-            paymentRecord.UpdatedAt = DateTimeProvider.IstNow;
-
-            await _registrationService.UpdatePaymentAfterWebhookAsync(paymentRecord.Id, confirmationData.RazorpayPaymentId, PaymentStatus.Captured);
 
             // Confirm the registration
             await _registrationService.ConfirmRegistrationAsync(paymentRecord.RegistrationId);

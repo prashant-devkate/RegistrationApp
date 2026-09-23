@@ -18,6 +18,19 @@ public class DashboardModel : PageModel
     private readonly ApplicationDbContext _dbContext;
     private readonly IBlobStorageService _blobStorageService;
     private readonly IConfiguration _configuration;
+    private readonly PaymentReconciliationRunner _reconciliationRunner;
+    private readonly ILogger<DashboardModel> _logger;
+
+    [TempData]
+    public string? ReconcileMessage { get; set; }
+
+    [TempData]
+    public bool ReconcileFailed { get; set; }
+
+    /// <summary>
+    /// State of the reconciliation runner, used to show progress and the last result
+    /// </summary>
+    public ReconciliationRunState ReconcileState { get; private set; } = new(false, null, null, false, null);
 
     public List<RegistrationDashboardDto> Registrations { get; set; } = new();
     public int TotalRegistrations { get; set; }
@@ -33,11 +46,18 @@ public class DashboardModel : PageModel
     public string? StatusFilter { get; set; }
     public string? SearchTerm { get; set; }
 
-    public DashboardModel(ApplicationDbContext dbContext, IBlobStorageService blobStorageService, IConfiguration configuration)
+    public DashboardModel(
+        ApplicationDbContext dbContext,
+        IBlobStorageService blobStorageService,
+        IConfiguration configuration,
+        PaymentReconciliationRunner reconciliationRunner,
+        ILogger<DashboardModel> logger)
     {
         _dbContext = dbContext;
         _blobStorageService = blobStorageService;
         _configuration = configuration;
+        _reconciliationRunner = reconciliationRunner;
+        _logger = logger;
     }
 
     public async Task OnGetAsync([FromQuery] int page = 1, [FromQuery] string? status = null, [FromQuery] string? q = null)
@@ -45,6 +65,8 @@ public class DashboardModel : PageModel
         CurrentPage = page < 1 ? 1 : page;
         StatusFilter = status;
         SearchTerm = q;
+
+        ReconcileState = _reconciliationRunner.GetState();
 
         // Summary cards always reflect the GRAND totals, regardless of the active tab/search,
         // so they stay a stable reference point no matter what's currently filtered in the table.
@@ -95,6 +117,44 @@ public class DashboardModel : PageModel
                 ? r.Payments.OrderByDescending(p => p.CreatedAt).First().Status.ToString()
                 : "None"
         }).ToList();
+    }
+
+    /// <summary>
+    /// Queues a payment reconciliation sweep so pending payments can be checked against
+    /// Razorpay without waiting for the daily run. The work happens in the background,
+    /// so this returns immediately and the result appears on a later page load.
+    /// </summary>
+    public IActionResult OnPostReconcile([FromQuery] int p = 1, [FromQuery] string? status = null, [FromQuery] string? q = null)
+    {
+        if (_reconciliationRunner.TryEnqueue("Manual"))
+        {
+            ReconcileFailed = false;
+            ReconcileMessage = "Reconciliation started. Refresh in a moment to see the result.";
+
+            _logger.LogInformation("Manual payment reconciliation queued by {User}", User?.Identity?.Name ?? "unknown");
+        }
+        else
+        {
+            ReconcileFailed = true;
+            ReconcileMessage = "A reconciliation run is already in progress. Please wait for it to finish.";
+        }
+
+        // Built by hand rather than with RedirectToPage: "page" is a reserved route value
+        // in Razor Pages, so passing it through routing breaks URL generation. The rest of
+        // this page uses plain query strings for the same reason.
+        var query = $"?page={(p < 1 ? 1 : p)}";
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query += $"&status={Uri.EscapeDataString(status)}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            query += $"&q={Uri.EscapeDataString(q)}";
+        }
+
+        return Redirect($"/dashboard{query}");
     }
 
     public async Task<IActionResult> OnGetExportAsync()

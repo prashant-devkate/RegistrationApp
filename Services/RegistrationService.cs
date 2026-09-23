@@ -70,7 +70,7 @@ public interface IRegistrationService
     /// <summary>
     /// Update payment status and Razorpay payment ID after webhook confirmation
     /// </summary>
-    Task UpdatePaymentAfterWebhookAsync(int paymentId, string razorpayPaymentId, PaymentStatus status);
+    Task UpdatePaymentAfterWebhookAsync(int paymentId, string razorpayPaymentId, PaymentStatus status, string? razorpaySignature = null);
 
     /// <summary>
     /// Get all registrations (with optional filtering)
@@ -111,14 +111,15 @@ public class RegistrationService : IRegistrationService
         // Validate input
         ValidateRegistrationInput(dto);
 
-        try { 
-        // Verify category exists
-        var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
-        if (category == null)
+        try
         {
-            _logger.LogWarning("Invalid category ID: {CategoryId}", dto.CategoryId);
-            throw new InvalidOperationException("Invalid category selected");
-        }
+            // Verify category exists
+            var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId);
+            if (category == null)
+            {
+                _logger.LogWarning("Invalid category ID: {CategoryId}", dto.CategoryId);
+                throw new InvalidOperationException("Invalid category selected");
+            }
 
             var registration = new Registration
             {
@@ -323,7 +324,7 @@ public class RegistrationService : IRegistrationService
     /// <summary>
     /// Update payment status and Razorpay payment ID after webhook confirmation
     /// </summary>
-    public async Task UpdatePaymentAfterWebhookAsync(int paymentId, string razorpayPaymentId, PaymentStatus status)
+    public async Task UpdatePaymentAfterWebhookAsync(int paymentId, string razorpayPaymentId, PaymentStatus status, string? razorpaySignature = null)
     {
         try
         {
@@ -335,8 +336,23 @@ public class RegistrationService : IRegistrationService
                 throw new InvalidOperationException($"Payment {paymentId} not found");
             }
 
+            // Webhooks can arrive out of order; never downgrade a terminal status
+            if ((payment.Status == PaymentStatus.Captured || payment.Status == PaymentStatus.Refunded)
+&& status != PaymentStatus.Refunded)
+            {
+                _logger.LogInformation("Payment {PaymentId} already in terminal status {Status}; ignoring update to {NewStatus}",
+                    paymentId, payment.Status, status);
+                return;
+            }
+
             payment.RazorpayPaymentId = razorpayPaymentId;
             payment.Status = status;
+
+            if (!string.IsNullOrEmpty(razorpaySignature))
+            {
+                payment.RazorpaySignature = razorpaySignature;
+            }
+
             payment.UpdatedAt = DateTimeProvider.IstNow;
 
             _dbContext.Payments.Update(payment);
